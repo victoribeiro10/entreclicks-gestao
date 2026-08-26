@@ -195,7 +195,6 @@
       width: 100%;
     }
 
-    /* KPIs Enxutos */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -271,7 +270,6 @@
       border-color: var(--dourado);
     }
 
-    /* Tabela Otimizada de 100% da Tela */
     .table-wrapper {
       background: var(--grafite);
       border: 1px solid var(--gold-border-soft);
@@ -283,7 +281,7 @@
       border-collapse: collapse;
       text-align: left;
       font-size: 12px;
-      min-width: 980px; /* Garante ajuste perfeito sem barra em telas > 1000px */
+      min-width: 980px;
     }
     thead th {
       background: var(--preto-2);
@@ -305,7 +303,6 @@
     }
     tbody tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-    /* Destaque Semana */
     tbody tr.evento-destaque-semana td {
       background-color: var(--destaque-semana-bg);
       border-top: 1px solid var(--destaque-semana-border);
@@ -389,7 +386,24 @@
       font-weight: 500;
     }
 
-    /* Toggle Switch Compacto */
+    /* Estilo do Link de Localização GPS */
+    .local-link {
+      color: var(--cinza-claro);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    .local-link:hover {
+      color: var(--destaque-semana);
+      transform: translateX(2px);
+    }
+    .local-icon {
+      color: var(--destaque-semana);
+      font-size: 11px;
+    }
+
     .toggle {
       position: relative;
       width: 32px;
@@ -420,21 +434,9 @@
     .toggle input:checked + .toggle-slider { background: rgba(78, 186, 135, 0.2); border-color: var(--sucesso); }
     .toggle input:checked + .toggle-slider::before { transform: translateX(15px); background: var(--sucesso); }
 
-    /* Layout da coluna de Produção / Toggles */
-    .toggles-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .toggle-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      color: var(--cinza-suave);
-    }
+    .toggles-group { display: flex; align-items: center; gap: 12px; }
+    .toggle-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--cinza-suave); }
 
-    /* Modais */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -474,7 +476,7 @@
       padding-bottom: 4px; border-bottom: 1px solid var(--gold-border-soft);
     }
 
-    .cloud-status { display: flex; items-center; gap: 5px; font-size: 10px; color: var(--cinza-suave); }
+    .cloud-status { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--cinza-suave); }
     .cloud-status.syncing { color: var(--destaque-semana); }
     .cloud-status.success { color: var(--sucesso); }
 
@@ -506,7 +508,7 @@
 
     .cliente-nome { font-weight: 600; color: #FFF; font-size: 12px; }
     .cliente-tel { font-size: 10px; color: var(--cinza-suave); }
-    .evento-local { font-size: 11px; color: var(--cinza-claro); }
+    .evento-local { font-size: 11px; }
     .evento-horario { font-size: 10px; color: var(--cinza-suave); }
     .valor-total { font-weight: 600; color: var(--dourado); font-size: 13px; }
     .saldo-restante { font-weight: 700; font-size: 11px; }
@@ -590,11 +592,11 @@
       </select>
     </div>
 
-    <!-- Tabela Limpa e Otimizada -->
+    <!-- Tabela -->
     <div class="section-header">
       <div>
         <h2 class="section-title">Agenda Executiva</h2>
-        <p class="section-subtitle">Acompanhamento completo e enxuto dos contratos da Entre Clicks</p>
+        <p class="section-subtitle">Clique no local para abrir o GPS (Google Maps/Waze)</p>
       </div>
     </div>
 
@@ -604,7 +606,7 @@
           <tr>
             <th>Data & Horário</th>
             <th>Cliente</th>
-            <th>Local</th>
+            <th>Local (GPS)</th>
             <th>Pacote & Extras</th>
             <th>Financeiro</th>
             <th>Status</th>
@@ -648,9 +650,9 @@
             <input type="date" id="ev-data" required>
           </div>
           <div class="form-group">
-            <label>Local da Festa</label>
-            <input type="text" id="ev-local" required placeholder="Ex: Salão Nobre - Centro">
-          </div>
+  <label>Local da Festa (Nome do Local, Cidade)</label>
+  <input type="text" id="ev-local" required placeholder="Ex: Cerimonial Palace, Cachoeiro">
+</div>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -807,7 +809,6 @@
   </div>
 
   <script>
-    // URL do seu Google Apps Script publicado
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby152aBtOS53VLdDeG1nKv_euFnyhfnj8Vyx6GOin_sIdBwoPmqOm3KzVTXiPSHSPZyWw/exec"; 
 
     const hojeObj = new Date();
@@ -829,7 +830,7 @@
           eventos = [
             {
               id: 1, cliente: "Mariana & Carlos", telefone: "(28) 99876-5432", data: dataHojeIso,
-              local: "Espaço Villa Garden - Alphaville", inicio: "19:00", termino: "23:00",
+              local: "Espaço Villa Garden, Alphaville", inicio: "19:00", termino: "23:00",
               valor: 1800, deslocamento: 80, pago: 700, fotos: 250, fotosReais: 0,
               moldura: "sim", contrato: "sim", status: "agendado", obsConclusao: "",
               adicionais: { ima: { ativo: true, valor: 150 }, livro: { ativo: true, valor: 180 }, hora: { ativo: false, valor: 0 }, outro: { ativo: false, desc: "", valor: 0 } }
@@ -1009,6 +1010,9 @@
         if (statusReal === 'concluido') rowClass = 'evento-concluido';
         else if (naSemana) rowClass = 'evento-destaque-semana';
 
+        // URL para abrir direto no Google Maps / GPS do celular
+        const urlMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.local)}`;
+
         const row = document.createElement('tr');
         row.className = rowClass;
         row.innerHTML = `
@@ -1027,14 +1031,19 @@
             <div class="cliente-tel">${ev.telefone}</div>
           </td>
 
-          <!-- 3. Local -->
-          <td><span class="evento-local">${ev.local}</span></td>
+          <!-- 3. Local com Link Direto para GPS / Google Maps -->
+          <td>
+            <a href="${urlMaps}" target="_blank" class="local-link" title="Abrir GPS / Google Maps">
+              <i class="fa-solid fa-location-dot local-icon"></i>
+              <span class="evento-local">${ev.local}</span>
+            </a>
+          </td>
 
           <!-- 4. Pacote & Extras -->
           <td>
             <div style="font-weight:500;">${formatMoney(ev.valor)}</div>
             ${badgesHtml ? `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">${badgesHtml}</div>` : ''}
-            ${ev.deslocamento > 0 ? `<div style="font-size:9px; color:var(--alerta);">Deslocamento: +${formatMoney(ev.deslocamento)}</div>` : ''}
+            ${ev.deslocamento > 0 ? `<div style="font-size:9px; color:var(--alerta);">Frete: +${formatMoney(ev.deslocamento)}</div>` : ''}
           </td>
 
           <!-- 5. Financeiro Completo -->
@@ -1054,7 +1063,7 @@
           <!-- 7. Fotos -->
           <td>${fotosHtml}</td>
 
-          <!-- 8. Moldura / Contrato Toggles Lado a Lado -->
+          <!-- 8. Moldura / Contrato -->
           <td>
             <div class="toggles-group">
               <div class="toggle-item" title="Moldura">
@@ -1074,7 +1083,7 @@
             </div>
           </td>
 
-          <!-- 9. Ações Enxutas -->
+          <!-- 9. Ações -->
           <td>
             <div class="actions-cell">
               ${statusReal !== 'concluido' ? `
