@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entre Clicks • Gestão de Eventos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --dourado: #D4AF7A;
+      --dourado-hover: #e5c38e;
+      --dourado-glow: rgba(212, 175, 122, 0.18);
+      --gold-border: rgba(212, 175, 122, 0.35);
+      --gold-border-soft: rgba(212, 175, 122, 0.15);
+      --preto-1: #0A0A0C;
+      --preto-2: #121215;
+      --grafite: #18181D;
+      --grafite-input: #0E0E12;
+      --cinza-suave: #9A9AA4;
+      --cinza-claro: #E4E4E8;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --sucesso: #4EBA87;
+      --alerta: #E5A84B;
+      --perigo: #E05D5D;
+      --destaque-semana: #38BDF8;
+      --destaque-semana-bg: rgba(56, 189, 248, 0.05);
+      --destaque-semana-border: rgba(56, 189, 248, 0.35);
+      --destaque-semana-hover: rgba(56, 189, 248, 0.09);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--preto-1);
+      color: var(--cinza-claro);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: var(--preto-2);
+      border-bottom: 1px solid var(--gold-border-soft);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--dourado);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: var(--cinza-suave);
+      letter-spacing: 2px;
+      text-transform: lowercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-gold {
+      padding: 10px 18px;
+      background: var(--grafite);
+      color: var(--dourado);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-gold:hover {
+      background: var(--preto-2);
+      border-color: var(--dourado);
+      box-shadow: 0 4px 15px rgba(212, 175, 122, 0.2);
+    }
+
+    .btn-outline {
+      padding: 10px 14px;
+      background: transparent;
+      color: var(--cinza-suave);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-outline:hover { border-color: var(--cinza-suave); color: #fff; }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--cinza-suave);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-cancel:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--cinza-suave);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-whatsapp-ic { border-color: rgba(78, 186, 135, 0.3); color: var(--sucesso); }
+    .btn-whatsapp-ic:hover { background: rgba(78, 186, 135, 0.15); }
+    .btn-edit-ic { border-color: var(--gold-border-soft); color: var(--dourado); }
+    .btn-edit-ic:hover { background: var(--dourado); color: var(--preto-1); }
+    .btn-delete-ic { border-color: rgba(224, 93, 93, 0.25); color: var(--perigo); }
+    .btn-delete-ic:hover { background: var(--perigo); color: #fff; }
+
+    .btn-concluir-sm {
+      background: transparent;
+      border: 1px solid rgba(78, 186, 135, 0.4);
+      color: var(--sucesso);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-concluir-sm:hover { background: var(--sucesso); color: var(--preto-1); }
+
+    .btn-pagamento-sm {
+      background: transparent;
+      border: 1px solid var(--gold-border);
+      color: var(--dourado);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-pagamento-sm:hover { background: var(--dourado); color: var(--preto-1); }
+
+    .main-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* KPIs Enxutos */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--grafite);
+      border: 1px solid var(--gold-border-soft);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+    }
+    .kpi-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--cinza-suave);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .kpi-value { font-size: 20px; font-weight: 600; color: #FFF; }
+    .kpi-value.gold { color: var(--dourado); }
+    .kpi-value.alert { color: var(--alerta); }
+    .kpi-value.success { color: var(--sucesso); }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #FFF;
+    }
+    .section-subtitle {
+      font-size: 11px;
+      color: var(--cinza-suave);
+      margin-top: 2px;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-bar input, .filter-bar select {
+      background: var(--grafite-input);
+      border: 1px solid var(--gold-border-soft);
+      color: #FFF;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      outline: none;
+    }
+    .filter-bar input:focus, .filter-bar select:focus {
+      border-color: var(--dourado);
+    }
+
+    /* Tabela Otimizada de 100% da Tela */
+    .table-wrapper {
+      background: var(--grafite);
+      border: 1px solid var(--gold-border-soft);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+      min-width: 980px; /* Garante ajuste perfeito sem barra em telas > 1000px */
+    }
+    thead th {
+      background: var(--preto-2);
+      color: var(--cinza-suave);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--gold-border-soft);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--cinza-claro);
+      vertical-align: middle;
+      transition: all 0.2s ease;
+    }
+    tbody tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Destaque Semana */
+    tbody tr.evento-destaque-semana td {
+      background-color: var(--destaque-semana-bg);
+      border-top: 1px solid var(--destaque-semana-border);
+      border-bottom: 1px solid var(--destaque-semana-border);
+    }
+    tbody tr.evento-destaque-semana td:first-child {
+      border-left: 3px solid var(--destaque-semana);
+    }
+    tbody tr.evento-destaque-semana:hover td {
+      background-color: var(--destaque-semana-hover);
+    }
+
+    .badge-semana {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--destaque-semana);
+      border: 1px solid var(--destaque-semana-border);
+      font-size: 8px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .badge-hoje {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(229, 168, 75, 0.15);
+      color: var(--alerta);
+      border: 1px solid rgba(229, 168, 75, 0.4);
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    tbody tr.evento-concluido { opacity: 0.45; }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .alerta-cobranca {
+      animation: pulseAlert 2s infinite;
+      color: var(--alerta);
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 50px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-quitado { background: rgba(78, 186, 135, 0.12); color: var(--sucesso); border: 1px solid rgba(78, 186, 135, 0.3); }
+    .badge-concluido { background: rgba(78, 186, 135, 0.2); color: var(--sucesso); border: 1px solid rgba(78, 186, 135, 0.5); }
+    .badge-agendado { background: rgba(212, 175, 122, 0.1); color: var(--dourado); border: 1px solid var(--gold-border-soft); }
+
+    .badge-add-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(212, 175, 122, 0.08);
+      color: var(--dourado);
+      border: 1px solid var(--gold-border-soft);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    /* Toggle Switch Compacto */
+    .toggle {
+      position: relative;
+      width: 32px;
+      height: 17px;
+      display: inline-block;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--preto-1);
+      border: 1px solid var(--gold-border-soft);
+      border-radius: 17px;
+      transition: 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 11px;
+      width: 11px;
+      left: 2px;
+      bottom: 2px;
+      background: var(--cinza-suave);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: rgba(78, 186, 135, 0.2); border-color: var(--sucesso); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(15px); background: var(--sucesso); }
+
+    /* Layout da coluna de Produção / Toggles */
+    .toggles-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toggle-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--cinza-suave);
+    }
+
+    /* Modais */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: var(--grafite);
+      border: 1px solid var(--gold-border);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      border-radius: var(--radius-md);
+      max-width: 640px;
+      width: 100%;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-box-sm { max-width: 400px; }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--gold-border-soft);
+    }
+    .modal-title { font-family: 'Playfair Display', serif; color: var(--dourado); font-size: 17px; }
+    .modal-section-title {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--dourado); font-weight: 600; margin-top: 16px; margin-bottom: 10px;
+      padding-bottom: 4px; border-bottom: 1px solid var(--gold-border-soft);
+    }
+
+    .cloud-status { display: flex; items-center; gap: 5px; font-size: 10px; color: var(--cinza-suave); }
+    .cloud-status.syncing { color: var(--destaque-semana); }
+    .cloud-status.success { color: var(--sucesso); }
+
+    .form-group { margin-bottom: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--cinza-suave); margin-bottom: 4px; font-weight: 500; }
+    input, select {
+      width: 100%; background: var(--grafite-input); border: 1px solid var(--gold-border-soft);
+      color: #FFF; padding: 8px 12px; border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 12px; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--dourado); }
+
+    .adicionais-card-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      background: var(--preto-2); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--gold-border-soft); margin-bottom: 12px;
+    }
+    .addon-item { display: flex; flex-direction: column; gap: 4px; background: var(--grafite); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.06); }
+    .addon-header { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .addon-header input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: var(--dourado); }
+    .addon-title { font-size: 11px; font-weight: 500; color: #FFF; }
+    .addon-val-input { font-size: 11px; padding: 4px 8px; margin-top: 2px; }
+
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--gold-border-soft); }
+    .actions-cell { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
+
+    .hidden { display: none; }
+
+    .cliente-nome { font-weight: 600; color: #FFF; font-size: 12px; }
+    .cliente-tel { font-size: 10px; color: var(--cinza-suave); }
+    .evento-local { font-size: 11px; color: var(--cinza-claro); }
+    .evento-horario { font-size: 10px; color: var(--cinza-suave); }
+    .valor-total { font-weight: 600; color: var(--dourado); font-size: 13px; }
+    .saldo-restante { font-weight: 700; font-size: 11px; }
+    .pago-info { font-size: 10px; color: var(--sucesso); }
+
+    .pagamento-cell { display: flex; flex-direction: column; gap: 1px; }
+
+    @media (max-width: 640px) {
+      .form-row, .form-row-3, .adicionais-card-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-container">
+      <div>
+        <div class="brand-title">
+          <i class="fa-solid fa-camera-retro"></i> ENTRE CLICKS
+        </div>
+        <div class="brand-subtitle">gestão de eventos</div>
+      </div>
+      <div class="header-actions">
+        <div id="cloud-indicator" class="cloud-status">
+          <i class="fa-solid fa-cloud"></i> <span id="cloud-text">Local</span>
+        </div>
+        <button onclick="exportarCSV()" class="btn-outline" title="Exportar dados para Excel">
+          <i class="fa-solid fa-file-excel"></i> Exportar
+        </button>
+        <button onclick="openModalEvento()" class="btn-gold">
+          <i class="fa-solid fa-plus"></i> Novo Evento
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- KPIs -->
+    <section class="kpi-grid">
+      <div class="kpi-card" style="border-color: var(--destaque-semana-border);">
+        <div class="kpi-label" style="color: var(--destaque-semana);"><i class="fa-solid fa-star" style="margin-right: 4px;"></i> Esta Semana</div>
+        <div class="kpi-value" style="color: var(--destaque-semana);" id="kpi-semana">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Faturamento Total</div>
+        <div class="kpi-value gold" id="kpi-fat">R$ 0,00</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total a Receber</div>
+        <div class="kpi-value alert" id="kpi-receber">R$ 0,00</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Eventos Concluídos</div>
+        <div class="kpi-value success" id="kpi-concluidos">0</div>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <div class="filter-bar">
+      <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" style="min-width: 180px;">
+      <input type="month" id="filtro-mes" oninput="render()">
+      
+      <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
+        <option value="">Todas as Datas</option>
+        <option value="semana">⭐ Somente Esta Semana</option>
+      </select>
+
+      <select id="filtro-status" onchange="render()">
+        <option value="">Todos os Status</option>
+        <option value="agendado">Agendados</option>
+        <option value="quitado">Quitados</option>
+        <option value="concluido">Concluídos</option>
+      </select>
+      
+      <select id="filtro-contrato" onchange="render()">
+        <option value="">Contratos</option>
+        <option value="sim">Com Contrato</option>
+        <option value="nao">Sem Contrato</option>
+      </select>
+    </div>
+
+    <!-- Tabela Limpa e Otimizada -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Agenda Executiva</h2>
+        <p class="section-subtitle">Acompanhamento completo e enxuto dos contratos da Entre Clicks</p>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Data & Horário</th>
+            <th>Cliente</th>
+            <th>Local</th>
+            <th>Pacote & Extras</th>
+            <th>Financeiro</th>
+            <th>Status</th>
+            <th>Fotos</th>
+            <th>Moldura / Contrato</th>
+            <th style="text-align:right;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="lista-eventos"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- MODAL CADASTRO / EDIÇÃO -->
+  <div id="modal-evento" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-titulo">Cadastrar Novo Evento</h3>
+        <i class="fa-solid fa-xmark" onclick="closeModalEvento()" style="cursor:pointer; color:var(--cinza-suave); font-size:16px;"></i>
+      </div>
+      <form id="form-evento" onsubmit="salvarEvento(event)">
+        <input type="hidden" id="ev-id">
+
+        <div class="modal-section-title"><i class="fa-solid fa-user" style="margin-right:6px;"></i> Dados do Cliente</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome do Cliente</label>
+            <input type="text" id="ev-cliente" required placeholder="Ex: Patrícia & Lucas">
+          </div>
+          <div class="form-group">
+            <label>Telefone / WhatsApp</label>
+            <input type="tel" id="ev-telefone" required placeholder="(28) 99999-9999">
+          </div>
+        </div>
+
+        <div class="modal-section-title"><i class="fa-solid fa-champagne-glasses" style="margin-right:6px;"></i> Dados do Evento</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data do Evento</label>
+            <input type="date" id="ev-data" required>
+          </div>
+          <div class="form-group">
+            <label>Local da Festa</label>
+            <input type="text" id="ev-local" required placeholder="Ex: Salão Nobre - Centro">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Início</label>
+            <input type="time" id="ev-inicio" required>
+          </div>
+          <div class="form-group">
+            <label>Término</label>
+            <input type="time" id="ev-termino" required>
+          </div>
+        </div>
+
+        <div class="modal-section-title"><i class="fa-solid fa-coins" style="margin-right:6px;"></i> Valores</div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Valor do Pacote (R$)</label>
+            <input type="number" step="0.01" id="ev-valor" required placeholder="1500.00">
+          </div>
+          <div class="form-group">
+            <label>Deslocamento (R$)</label>
+            <input type="number" step="0.01" id="ev-deslocamento" placeholder="0.00" value="0">
+          </div>
+          <div class="form-group">
+            <label>Valor Pago / Entrada (R$)</label>
+            <input type="number" step="0.01" id="ev-pago" placeholder="500.00" value="0">
+          </div>
+        </div>
+
+        <div class="modal-section-title"><i class="fa-solid fa-layer-group" style="margin-right:6px;"></i> Adicionais Contratados</div>
+        <div class="adicionais-card-grid">
+          <div class="addon-item">
+            <label class="addon-header">
+              <input type="checkbox" id="add-check-ima" onchange="toggleAddonInput('ima')">
+              <span class="addon-title">🧲 Foto Ímã</span>
+            </label>
+            <input type="number" step="0.01" id="add-val-ima" class="addon-val-input hidden" placeholder="Valor (R$)" value="150.00">
+          </div>
+          <div class="addon-item">
+            <label class="addon-header">
+              <input type="checkbox" id="add-check-livro" onchange="toggleAddonInput('livro')">
+              <span class="addon-title">📖 Livro de Mensagens</span>
+            </label>
+            <input type="number" step="0.01" id="add-val-livro" class="addon-val-input hidden" placeholder="Valor (R$)" value="180.00">
+          </div>
+          <div class="addon-item">
+            <label class="addon-header">
+              <input type="checkbox" id="add-check-hora" onchange="toggleAddonInput('hora')">
+              <span class="addon-title">⏱️ Hora Adicional</span>
+            </label>
+            <input type="number" step="0.01" id="add-val-hora" class="addon-val-input hidden" placeholder="Valor (R$)" value="300.00">
+          </div>
+          <div class="addon-item">
+            <label class="addon-header">
+              <input type="checkbox" id="add-check-outro" onchange="toggleAddonInput('outro')">
+              <span class="addon-title">➕ Outro Adicional</span>
+            </label>
+            <div id="add-box-outro" class="hidden" style="display:flex; flex-direction:column; gap:4px;">
+              <input type="text" id="add-desc-outro" class="addon-val-input" placeholder="O que é?">
+              <input type="number" step="0.01" id="add-val-outro" class="addon-val-input" placeholder="Valor (R$)" value="100.00">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-section-title"><i class="fa-solid fa-camera" style="margin-right:6px;"></i> Produção & Contrato</div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>Qtd Fotos (Estimada)</label>
+            <input type="number" id="ev-fotos" placeholder="200" value="0">
+          </div>
+          <div class="form-group">
+            <label>Tem Moldura?</label>
+            <select id="ev-moldura">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Contrato Assinado?</label>
+            <select id="ev-contrato">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" onclick="closeModalEvento()" class="btn-cancel">Cancelar</button>
+          <button type="submit" class="btn-gold" id="btn-salvar">Salvar Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONCLUIR EVENTO -->
+  <div id="modal-concluir" class="modal-overlay hidden">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>Concluir Evento</h3>
+        <i class="fa-solid fa-xmark" onclick="closeModalConcluir()" style="cursor:pointer; color:var(--cinza-suave); font-size:16px;"></i>
+      </div>
+      <p style="font-size:12px; color:var(--cinza-suave); margin-bottom:14px;">
+        Evento: <strong style="color:#FFF;" id="concluir-cliente-nome"></strong><br>
+        Data: <strong style="color:var(--dourado);" id="concluir-evento-data"></strong>
+      </p>
+      <form id="form-concluir" onsubmit="finalizarConclusao(event)">
+        <input type="hidden" id="concluir-id">
+        <div class="form-group">
+          <label>Quantidade Real de Fotos Impressas</label>
+          <input type="number" id="concluir-fotos-reais" required placeholder="Ex: 237" min="0">
+        </div>
+        <div class="form-group">
+          <label>Observações (opcional)</label>
+          <input type="text" id="concluir-obs" placeholder="Ex: Cliente adorou">
+        </div>
+        <div class="modal-actions">
+          <button type="button" onclick="closeModalConcluir()" class="btn-cancel">Cancelar</button>
+          <button type="submit" class="btn-gold" style="border-color: var(--sucesso); color: var(--sucesso);">
+            <i class="fa-solid fa-check"></i> Finalizar Evento
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ATUALIZAR PAGAMENTO -->
+  <div id="modal-pagamento" class="modal-overlay hidden">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-money-bill-wave" style="margin-right:6px;"></i>Atualizar Pagamento</h3>
+        <i class="fa-solid fa-xmark" onclick="closeModalPagamento()" style="cursor:pointer; color:var(--cinza-suave); font-size:16px;"></i>
+      </div>
+      <p style="font-size:12px; color:var(--cinza-suave); margin-bottom:4px;">
+        Cliente: <strong style="color:#FFF;" id="pag-cliente-nome"></strong>
+      </p>
+      <p style="font-size:11px; color:var(--cinza-suave); margin-bottom:14px;">
+        Total: <strong style="color:var(--dourado);" id="pag-valor-total"></strong> |
+        Pago: <strong style="color:var(--sucesso);" id="pag-valor-atual"></strong> |
+        Resta: <strong style="color:var(--alerta);" id="pag-valor-resta"></strong>
+      </p>
+      <form id="form-pagamento" onsubmit="salvarPagamento(event)">
+        <input type="hidden" id="pag-id">
+        <div class="form-group">
+          <label>Novo Valor Total Pago (R$)</label>
+          <input type="number" step="0.01" id="pag-novo-valor" required placeholder="Ex: 1200.00">
+        </div>
+        <div class="modal-actions">
+          <button type="button" onclick="closeModalPagamento()" class="btn-cancel">Cancelar</button>
+          <button type="submit" class="btn-gold">
+            <i class="fa-solid fa-check"></i> Atualizar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // URL do seu Google Apps Script publicado
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby152aBtOS53VLdDeG1nKv_euFnyhfnj8Vyx6GOin_sIdBwoPmqOm3KzVTXiPSHSPZyWw/exec"; 
+
+    const hojeObj = new Date();
+    const dataHojeIso = hojeObj.toISOString().split('T')[0];
+
+    let eventos = JSON.parse(localStorage.getItem('ec_eventos_v8')) || [];
+
+    function setCloudStatus(status, text) {
+      const el = document.getElementById('cloud-indicator');
+      const elText = document.getElementById('cloud-text');
+      el.className = "cloud-status " + status;
+      elText.innerText = text;
+    }
+
+    async function carregarDados() {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "SEU_LINK_AQUI") {
+        setCloudStatus('', 'Modo Local');
+        if (eventos.length === 0) {
+          eventos = [
+            {
+              id: 1, cliente: "Mariana & Carlos", telefone: "(28) 99876-5432", data: dataHojeIso,
+              local: "Espaço Villa Garden - Alphaville", inicio: "19:00", termino: "23:00",
+              valor: 1800, deslocamento: 80, pago: 700, fotos: 250, fotosReais: 0,
+              moldura: "sim", contrato: "sim", status: "agendado", obsConclusao: "",
+              adicionais: { ima: { ativo: true, valor: 150 }, livro: { ativo: true, valor: 180 }, hora: { ativo: false, valor: 0 }, outro: { ativo: false, desc: "", valor: 0 } }
+            }
+          ];
+          localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
+        }
+        render();
+        return;
+      }
+
+      setCloudStatus('syncing', 'Buscando...');
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await response.json();
+        eventos = data;
+        localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
+        setCloudStatus('success', 'Nuvem OK');
+      } catch (err) {
+        console.error("Erro ao sincronizar.", err);
+        setCloudStatus('perigo', 'Erro (Offline)');
+      }
+      render();
+    }
+
+    async function sincronizarComNuvem(acao, dados) {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "SEU_LINK_AQUI") return;
+      setCloudStatus('syncing', 'Salvando...');
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ acao: acao, dados: dados })
+        });
+        setCloudStatus('success', 'Salvo na Nuvem');
+        setTimeout(carregarDados, 1500);
+      } catch (err) {
+        console.error("Erro ao enviar dados.", err);
+        setCloudStatus('perigo', 'Erro ao salvar');
+      }
+    }
+
+    function formatMoney(v) {
+      return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularTotalAdicionais(adds) {
+      if (!adds) return 0;
+      let t = 0;
+      if (adds.ima?.ativo) t += parseFloat(adds.ima.valor) || 0;
+      if (adds.livro?.ativo) t += parseFloat(adds.livro.valor) || 0;
+      if (adds.hora?.ativo) t += parseFloat(adds.hora.valor) || 0;
+      if (adds.outro?.ativo) t += parseFloat(adds.outro.valor) || 0;
+      return t;
+    }
+
+    function getValorTotal(ev) {
+      return ev.valor + calcularTotalAdicionais(ev.adicionais) + (ev.deslocamento || 0);
+    }
+
+    function getSaldoRestante(ev) {
+      return Math.max(0, getValorTotal(ev) - (ev.pago || 0));
+    }
+
+    function getStatusReal(ev) {
+      if (ev.status === 'concluido') return 'concluido';
+      if (getSaldoRestante(ev) === 0) return 'quitado';
+      return 'agendado';
+    }
+
+    function diasParaEvento(ev) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      const dataEv = new Date(ev.data + 'T00:00:00');
+      return Math.ceil((dataEv - hoje) / (1000 * 60 * 60 * 24));
+    }
+
+    function isNaSemanaAtual(dateStr) {
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      const diaSemana = hoje.getDay();
+      const distSegunda = diaSemana === 0 ? -6 : 1 - diaSemana;
+      const segunda = new Date(hoje);
+      segunda.setDate(hoje.getDate() + distSegunda);
+      segunda.setHours(0, 0, 0, 0);
+      const domingo = new Date(segunda);
+      domingo.setDate(segunda.getDate() + 6);
+      domingo.setHours(23, 59, 59, 999);
+      const dataEv = new Date(dateStr + 'T00:00:00');
+      return dataEv >= segunda && dataEv <= domingo;
+    }
+
+    function isHoje(dateStr) {
+      const hoje = new Date().toISOString().split('T')[0];
+      return dateStr === hoje;
+    }
+
+    function toggleAddonInput(tipo) {
+      if (tipo === 'outro') {
+        const c = document.getElementById('add-check-outro').checked;
+        document.getElementById('add-box-outro').classList.toggle('hidden', !c);
+      } else {
+        const c = document.getElementById(`add-check-${tipo}`).checked;
+        document.getElementById(`add-val-${tipo}`).classList.toggle('hidden', !c);
+      }
+    }
+
+    function render() {
+      const tbody = document.getElementById('lista-eventos');
+      tbody.innerHTML = '';
+
+      const busca = document.getElementById('filtro-busca').value.toLowerCase();
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      const periodoFiltro = document.getElementById('filtro-periodo').value;
+      const statusFiltro = document.getElementById('filtro-status').value;
+      const contratoFiltro = document.getElementById('filtro-contrato').value;
+
+      let totalFat = 0, totalReceber = 0, qtdFiltrados = 0, qtdConcluidos = 0, qtdSemana = 0;
+
+      eventos.forEach(ev => {
+        if (isNaSemanaAtual(ev.data) && ev.status !== 'concluido') qtdSemana++;
+      });
+
+      const ordenados = [...eventos].sort((a, b) => new Date(a.data) - new Date(b.data));
+
+      ordenados.forEach(ev => {
+        const statusReal = getStatusReal(ev);
+        const naSemana = isNaSemanaAtual(ev.data);
+        const ehHoje = isHoje(ev.data);
+
+        if (busca && !ev.cliente.toLowerCase().includes(busca)) return;
+        if (mesFiltro && !ev.data.startsWith(mesFiltro)) return;
+        if (periodoFiltro === 'semana' && !naSemana) return;
+        if (statusFiltro && statusReal !== statusFiltro) return;
+        if (contratoFiltro && ev.contrato !== contratoFiltro) return;
+
+        qtdFiltrados++;
+        if (statusReal === 'concluido') qtdConcluidos++;
+
+        const valorTotal = getValorTotal(ev);
+        const saldo = getSaldoRestante(ev);
+        const dias = diasParaEvento(ev);
+
+        totalFat += valorTotal;
+        totalReceber += saldo;
+
+        const dataFormatada = ev.data.split('-').reverse().join('/');
+        const alertaCobranca = (dias >= 0 && dias <= 7 && saldo > 0 && statusReal !== 'concluido');
+
+        // Tags adicionais
+        let badgesHtml = '';
+        if (ev.adicionais) {
+          if (ev.adicionais.ima?.ativo) badgesHtml += `<span class="badge-add-tag">🧲 Ímã</span>`;
+          if (ev.adicionais.livro?.ativo) badgesHtml += `<span class="badge-add-tag">📖 Livro</span>`;
+          if (ev.adicionais.hora?.ativo) badgesHtml += `<span class="badge-add-tag">⏱️ Hora+</span>`;
+          if (ev.adicionais.outro?.ativo) badgesHtml += `<span class="badge-add-tag">➕ ${ev.adicionais.outro.desc || 'Outro'}</span>`;
+        }
+
+        // Status Badge
+        let statusBadge = '';
+        if (statusReal === 'concluido') {
+          statusBadge = `<span class="badge badge-concluido">Concluído</span>`;
+        } else if (statusReal === 'quitado') {
+          statusBadge = `<span class="badge badge-quitado">Quitado</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-agendado">Agendado</span>`;
+        }
+
+        // Fotos
+        let fotosHtml = `<span style="color:var(--cinza-suave);">${ev.fotos || 0} est.</span>`;
+        if (statusReal === 'concluido') {
+          fotosHtml = `<span style="color:var(--sucesso); font-weight:700;">${ev.fotosReais || 0}</span> <span style="font-size:9px; color:var(--cinza-suave);">/ ${ev.fotos || 0}</span>`;
+        }
+
+        let rowClass = '';
+        if (statusReal === 'concluido') rowClass = 'evento-concluido';
+        else if (naSemana) rowClass = 'evento-destaque-semana';
+
+        const row = document.createElement('tr');
+        row.className = rowClass;
+        row.innerHTML = `
+          <!-- 1. Data & Horário -->
+          <td style="font-weight:600; color:var(--dourado); white-space:nowrap;">
+            <div>${dataFormatada}</div>
+            <div class="evento-horario">${ev.inicio} - ${ev.termino}</div>
+            ${ehHoje ? `<span class="badge-hoje"><i class="fa-solid fa-bolt"></i> HOJE</span>` : 
+              (naSemana && statusReal !== 'concluido' ? `<span class="badge-semana"><i class="fa-solid fa-star"></i> ESTA SEMANA</span>` : '')
+            }
+          </td>
+
+          <!-- 2. Cliente -->
+          <td>
+            <div class="cliente-nome">${ev.cliente}</div>
+            <div class="cliente-tel">${ev.telefone}</div>
+          </td>
+
+          <!-- 3. Local -->
+          <td><span class="evento-local">${ev.local}</span></td>
+
+          <!-- 4. Pacote & Extras -->
+          <td>
+            <div style="font-weight:500;">${formatMoney(ev.valor)}</div>
+            ${badgesHtml ? `<div style="display:flex; gap:3px; flex-wrap:wrap; margin-top:2px;">${badgesHtml}</div>` : ''}
+            ${ev.deslocamento > 0 ? `<div style="font-size:9px; color:var(--alerta);">Deslocamento: +${formatMoney(ev.deslocamento)}</div>` : ''}
+          </td>
+
+          <!-- 5. Financeiro Completo -->
+          <td>
+            <div class="valor-total">${formatMoney(valorTotal)}</div>
+            <div class="pagamento-cell">
+              <span class="pago-info">Pago: ${formatMoney(ev.pago || 0)}</span>
+              ${saldo > 0
+                ? `<span class="saldo-restante ${alertaCobranca ? 'alerta-cobranca' : ''}">Resta: ${formatMoney(saldo)}</span>`
+                : `<span style="font-size:9px; color:var(--sucesso); font-weight:600;">✓ Quitado</span>`}
+            </div>
+          </td>
+
+          <!-- 6. Status -->
+          <td>${statusBadge}</td>
+
+          <!-- 7. Fotos -->
+          <td>${fotosHtml}</td>
+
+          <!-- 8. Moldura / Contrato Toggles Lado a Lado -->
+          <td>
+            <div class="toggles-group">
+              <div class="toggle-item" title="Moldura">
+                <span>🖼️</span>
+                <label class="toggle">
+                  <input type="checkbox" ${ev.moldura === 'sim' ? 'checked' : ''} onchange="toggleCampo(${ev.id}, 'moldura', this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-item" title="Contrato">
+                <span>📄</span>
+                <label class="toggle">
+                  <input type="checkbox" ${ev.contrato === 'sim' ? 'checked' : ''} onchange="toggleCampo(${ev.id}, 'contrato', this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </td>
+
+          <!-- 9. Ações Enxutas -->
+          <td>
+            <div class="actions-cell">
+              ${statusReal !== 'concluido' ? `
+                <button class="btn-pagamento-sm" onclick="openModalPagamento(${ev.id})" title="Atualizar pagamento">$</button>
+              ` : ''}
+              ${(dias <= 0 || statusReal === 'quitado') && statusReal !== 'concluido' ? `
+                <button class="btn-concluir-sm" onclick="openModalConcluir(${ev.id})" title="Concluir evento">✓</button>
+              ` : ''}
+              <button class="btn-icon btn-whatsapp-ic" onclick="abrirWhatsApp('${ev.telefone}', '${ev.cliente}', '${dataFormatada}')" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
+              <button class="btn-icon btn-edit-ic" onclick="editarEvento(${ev.id})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn-icon btn-delete-ic" onclick="excluirEvento(${ev.id})" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById('kpi-semana').innerText = qtdSemana;
+      document.getElementById('kpi-fat').innerText = formatMoney(totalFat);
+      document.getElementById('kpi-receber').innerText = formatMoney(totalReceber);
+      document.getElementById('kpi-concluidos').innerText = qtdConcluidos;
+
+      localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
+    }
+
+    async function toggleCampo(id, campo, valor) {
+      const ev = eventos.find(e => e.id === id);
+      if (ev) {
+        ev[campo] = valor ? 'sim' : 'nao';
+        render();
+        await sincronizarComNuvem('editar', ev);
+      }
+    }
+
+    function openModalEvento() {
+      document.getElementById('modal-evento').classList.remove('hidden');
+      document.getElementById('modal-titulo').innerText = 'Cadastrar Novo Evento';
+      document.getElementById('btn-salvar').innerText = 'Salvar Evento';
+      document.getElementById('form-evento').reset();
+      document.getElementById('ev-id').value = '';
+      document.getElementById('ev-deslocamento').value = '0';
+      document.getElementById('ev-pago').value = '0';
+      document.getElementById('ev-fotos').value = '0';
+      ['ima', 'livro', 'hora'].forEach(t => {
+        document.getElementById(`add-check-${t}`).checked = false;
+        document.getElementById(`add-val-${t}`).classList.add('hidden');
+      });
+      document.getElementById('add-check-outro').checked = false;
+      document.getElementById('add-box-outro').classList.add('hidden');
+    }
+    function closeModalEvento() { document.getElementById('modal-evento').classList.add('hidden'); }
+
+    async function salvarEvento(e) {
+      e.preventDefault();
+      const id = document.getElementById('ev-id').value;
+      const adicionaisObj = {
+        ima: { ativo: document.getElementById('add-check-ima').checked, valor: parseFloat(document.getElementById('add-val-ima').value) || 0 },
+        livro: { ativo: document.getElementById('add-check-livro').checked, valor: parseFloat(document.getElementById('add-val-livro').value) || 0 },
+        hora: { ativo: document.getElementById('add-check-hora').checked, valor: parseFloat(document.getElementById('add-val-hora').value) || 0 },
+        outro: { ativo: document.getElementById('add-check-outro').checked, desc: document.getElementById('add-desc-outro').value, valor: parseFloat(document.getElementById('add-val-outro').value) || 0 }
+      };
+      const dados = {
+        cliente: document.getElementById('ev-cliente').value,
+        telefone: document.getElementById('ev-telefone').value,
+        data: document.getElementById('ev-data').value,
+        local: document.getElementById('ev-local').value,
+        inicio: document.getElementById('ev-inicio').value,
+        termino: document.getElementById('ev-termino').value,
+        valor: parseFloat(document.getElementById('ev-valor').value) || 0,
+        deslocamento: parseFloat(document.getElementById('ev-deslocamento').value) || 0,
+        pago: parseFloat(document.getElementById('ev-pago').value) || 0,
+        fotos: parseInt(document.getElementById('ev-fotos').value) || 0,
+        moldura: document.getElementById('ev-moldura').value,
+        contrato: document.getElementById('ev-contrato').value,
+        adicionais: adicionaisObj
+      };
+
+      if (id) {
+        dados.id = parseInt(id);
+        const original = eventos.find(ev => ev.id === dados.id);
+        dados.fotosReais = original.fotosReais || 0;
+        dados.status = original.status || 'agendado';
+        dados.obsConclusao = original.obsConclusao || '';
+        dados.calendarEventId = original.calendarEventId || '';
+        await sincronizarComNuvem('editar', dados);
+      } else {
+        dados.id = Date.now();
+        dados.fotosReais = 0;
+        dados.status = 'agendado';
+        dados.obsConclusao = '';
+        dados.calendarEventId = '';
+        await sincronizarComNuvem('criar', dados);
+      }
+      closeModalEvento();
+    }
+
+    function editarEvento(id) {
+      const ev = eventos.find(e => e.id === id);
+      if (!ev) return;
+      document.getElementById('modal-evento').classList.remove('hidden');
+      document.getElementById('modal-titulo').innerText = 'Editar Evento';
+      document.getElementById('btn-salvar').innerText = 'Atualizar Evento';
+      document.getElementById('ev-id').value = ev.id;
+      document.getElementById('ev-cliente').value = ev.cliente;
+      document.getElementById('ev-telefone').value = ev.telefone;
+      document.getElementById('ev-data').value = ev.data;
+      document.getElementById('ev-local').value = ev.local;
+      document.getElementById('ev-inicio').value = ev.inicio;
+      document.getElementById('ev-termino').value = ev.termino;
+      document.getElementById('ev-valor').value = ev.valor;
+      document.getElementById('ev-deslocamento').value = ev.deslocamento || 0;
+      document.getElementById('ev-pago').value = ev.pago || 0;
+      document.getElementById('ev-fotos').value = ev.fotos || 0;
+      document.getElementById('ev-moldura').value = ev.moldura || 'nao';
+      document.getElementById('ev-contrato').value = ev.contrato || 'nao';
+      const adds = ev.adicionais || {};
+      ['ima', 'livro', 'hora'].forEach(t => {
+        const ativo = !!adds[t]?.ativo;
+        document.getElementById(`add-check-${t}`).checked = ativo;
+        document.getElementById(`add-val-${t}`).value = adds[t]?.valor || 0;
+        document.getElementById(`add-val-${t}`).classList.toggle('hidden', !ativo);
+      });
+      const outroAtivo = !!adds.outro?.ativo;
+      document.getElementById('add-check-outro').checked = outroAtivo;
+      document.getElementById('add-desc-outro').value = adds.outro?.desc || '';
+      document.getElementById('add-val-outro').value = adds.outro?.valor || 0;
+      document.getElementById('add-box-outro').classList.toggle('hidden', !outroAtivo);
+    }
+
+    async function excluirEvento(id) {
+      if (confirm('Tem certeza que deseja excluir este evento?')) {
+        const ev = eventos.find(e => e.id === id);
+        eventos = eventos.filter(e => e.id !== id);
+        render();
+        await sincronizarComNuvem('excluir', { id: id, calendarEventId: ev.calendarEventId });
+      }
+    }
+
+    function openModalPagamento(id) {
+      const ev = eventos.find(e => e.id === id);
+      if (!ev) return;
+      const vt = getValorTotal(ev);
+      const saldo = getSaldoRestante(ev);
+      document.getElementById('modal-pagamento').classList.remove('hidden');
+      document.getElementById('pag-id').value = ev.id;
+      document.getElementById('pag-cliente-nome').innerText = ev.cliente;
+      document.getElementById('pag-valor-total').innerText = formatMoney(vt);
+      document.getElementById('pag-valor-atual').innerText = formatMoney(ev.pago || 0);
+      document.getElementById('pag-valor-resta').innerText = formatMoney(saldo);
+      document.getElementById('pag-novo-valor').value = ev.pago || 0;
+      document.getElementById('pag-novo-valor').max = vt;
+    }
+    function closeModalPagamento() { document.getElementById('modal-pagamento').classList.add('hidden'); }
+
+    async function salvarPagamento(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('pag-id').value);
+      const novoValor = parseFloat(document.getElementById('pag-novo-valor').value) || 0;
+      const ev = eventos.find(e => e.id === id);
+      if (ev) {
+        ev.pago = Math.min(novoValor, getValorTotal(ev));
+        render();
+        await sincronizarComNuvem('editar', ev);
+      }
+      closeModalPagamento();
+    }
+
+    function openModalConcluir(id) {
+      const ev = eventos.find(e => e.id === id);
+      if (!ev) return;
+      document.getElementById('modal-concluir').classList.remove('hidden');
+      document.getElementById('concluir-id').value = ev.id;
+      document.getElementById('concluir-cliente-nome').innerText = ev.cliente;
+      document.getElementById('concluir-evento-data').innerText = ev.data.split('-').reverse().join('/');
+      document.getElementById('concluir-fotos-reais').value = ev.fotos || 0;
+      document.getElementById('concluir-obs').value = ev.obsConclusao || '';
+    }
+    function closeModalConcluir() { document.getElementById('modal-concluir').classList.add('hidden'); }
+
+    async function finalizarConclusao(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('concluir-id').value);
+      const ev = eventos.find(e => e.id === id);
+      if (ev) {
+        ev.fotosReais = parseInt(document.getElementById('concluir-fotos-reais').value) || 0;
+        ev.obsConclusao = document.getElementById('concluir-obs').value;
+        ev.status = 'concluido';
+        ev.pago = getValorTotal(ev);
+        render();
+        await sincronizarComNuvem('editar', ev);
+      }
+      closeModalConcluir();
+    }
+
+    function abrirWhatsApp(tel, cliente, data) {
+      const numero = tel.replace(/\D/g, '');
+      const msg = encodeURIComponent(`Olá ${cliente}! Tudo bem? 😊\nPassando para confirmar os detalhes do seu evento no dia ${data} com a *Entre Clicks*.`);
+      window.open(`https://wa.me/55${numero}?text=${msg}`, '_blank');
+    }
+
+    function exportarCSV() {
+      if (eventos.length === 0) { alert("Sem dados para exportar."); return; }
+
+      let csv = "\uFEFF";
+      csv += "Data;Cliente;Telefone;Local;Inicio;Termino;Valor Pacote;Deslocamento;Valor Pago;Saldo Restante;Qtd Fotos;Moldura;Contrato;Adicionais\n";
+
+      eventos.forEach(ev => {
+        const total = getValorTotal(ev);
+        const saldo = getSaldoRestante(ev);
+        let adds = [];
+        if (ev.adicionais) {
+          if (ev.adicionais.ima?.ativo) adds.push("Foto Ima");
+          if (ev.adicionais.livro?.ativo) adds.push("Livro de Mensagens");
+          if (ev.adicionais.hora?.ativo) adds.push("Hora Adicional");
+          if (ev.adicionais.outro?.ativo) adds.push(ev.adicionais.outro.desc || "Outro");
+        }
+
+        csv += `${ev.data.split('-').reverse().join('/')};`;
+        csv += `${ev.cliente.replace(/;/g, ',')};`;
+        csv += `${ev.telefone};`;
+        csv += `${ev.local.replace(/;/g, ',')};`;
+        csv += `${ev.inicio};`;
+        csv += `${ev.termino};`;
+        csv += `${ev.valor};`;
+        csv += `${ev.deslocamento};`;
+        csv += `${ev.pago};`;
+        csv += `${saldo};`;
+        csv += `${ev.status === 'concluido' ? ev.fotosReais : ev.fotos};`;
+        csv += `${ev.moldura.toUpperCase()};`;
+        csv += `${ev.contrato.toUpperCase()};`;
+        csv += `"${adds.join(', ')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `entre_clicks_agenda_${new Date().getFullYear()}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    carregarDados();
+  </script>
+</body>
+</html>
