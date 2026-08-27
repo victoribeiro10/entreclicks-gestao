@@ -730,7 +730,7 @@
           </td>
           <td><div class="cliente-nome">${ev.cliente}</div><div class="cliente-tel">${ev.telefone}</div></td>
           <td><a class="local-link" href="${urlMaps}" target="_blank"><i class="fa-solid fa-location-dot local-icon"></i><span class="evento-local">${ev.local}</span></a></td>
-          <td><div style="font-weight:500;">${formatMoney(ev.valor)}</div>${badges?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">${badges}</div>`:''}${ev.deslocamento>0?`<div style="font-size:9px;color:var(--alerta);">Frete: +${formatMoney(ev.deslocamento)}</div>`:''}</td>
+          <td><div style="font-weight:500;">${formatMoney(ev.valor)}</div>${badges?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">${badges}</div>`:''}${ev.deslocamento>0?`<div style="font-size:9px;color:var(--alerta);">Deslocamento: +${formatMoney(ev.deslocamento)}</div>`:''}</td>
           <td><div class="valor-total">${formatMoney(total)}</div><div class="pagamento-cell"><span class="pago-info">Pago: ${formatMoney(ev.pago||0)}</span>${saldo>0?`<span class="saldo-restante ${alerta?'alerta-cobranca':''}">Resta: ${formatMoney(saldo)}</span>`:`<span style="font-size:9px;color:var(--sucesso);font-weight:600;">✓ Quitado</span>`}</div></td>
           <td>${statusBadge}</td>
           <td>${fotosHtml}</td>
