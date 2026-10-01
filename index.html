@@ -583,7 +583,7 @@
 
     // ===================== LOGIN =====================
     function isLogado() {
-      return sessionStorage.getItem('ec_hub_auth') === 'ok';
+      return localStorage.getItem('ec_hub_auth') === 'ok';
     }
 
     function liberarApp() {
@@ -598,7 +598,7 @@
       const erro = document.getElementById('login-error');
 
       if (senha === SENHA_HUB) {
-        sessionStorage.setItem('ec_hub_auth', 'ok');
+        localStorage.setItem('ec_hub_auth', 'ok');
         erro.innerText = '';
         liberarApp();
       } else {
@@ -609,7 +609,7 @@
     }
 
     function fazerLogout() {
-      sessionStorage.removeItem('ec_hub_auth');
+      localStorage.removeItem('ec_hub_auth');
       location.reload();
     }
 
