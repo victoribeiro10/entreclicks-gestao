@@ -354,6 +354,14 @@
     label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--cinza-suave); margin-bottom: 4px; font-weight: 500; }
     input, select { width: 100%; background: var(--grafite-input); border: 1px solid var(--gold-border-soft); color: #FFF; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; outline: none; }
     input:focus, select:focus { border-color: var(--dourado); }
+    input[type="time"] {
+      min-height: 44px;
+      width: 100%;
+      color-scheme: dark;
+      touch-action: manipulation;
+      -webkit-appearance: auto;
+      appearance: auto;
+    }
 
     .adicionais-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--preto-2); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--gold-border-soft); margin-bottom: 12px; }
     .addon-item { display: flex; flex-direction: column; gap: 4px; background: var(--grafite); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,.06); }
@@ -520,8 +528,8 @@
           <div class="form-group"><label>Local da Festa (Nome, Cidade)</label><input type="text" id="ev-local" required placeholder="Ex: Cerimonial Palace, Cachoeiro"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Início</label><input type="time" id="ev-inicio" required></div>
-          <div class="form-group"><label>Término</label><input type="time" id="ev-termino" required></div>
+          <div class="form-group"><label>Início</label><input type="time" id="ev-inicio" required step="60" inputmode="numeric" autocomplete="off"></div>
+          <div class="form-group"><label>Término</label><input type="time" id="ev-termino" required step="60" inputmode="numeric" autocomplete="off"></div>
         </div>
         <div class="modal-section-title">Valores</div>
         <div class="form-row-3">
@@ -794,9 +802,14 @@
         dados.status=original?.status||'agendado';
         dados.obsConclusao=original?.obsConclusao||'';
         dados.calendarEventId=original?.calendarEventId||'';
+        // Atualiza a agenda local imediatamente, inclusive no navegador do celular.
+        eventos=eventos.map(ev=>ev.id===dados.id?{...ev,...dados}:ev);
+        render();
         await sincronizarComNuvem('editar', dados);
       } else {
         dados.id=Date.now(); dados.fotosReais=0; dados.status='agendado'; dados.obsConclusao=''; dados.calendarEventId='';
+        eventos.push(dados);
+        render();
         await sincronizarComNuvem('criar', dados);
       }
       closeModalEvento();
