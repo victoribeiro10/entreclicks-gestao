@@ -700,7 +700,19 @@
 
       let fat=0, receber=0, concluidos=0, semana=0;
       eventos.forEach(ev=>{ if(isNaSemanaAtual(ev.data)&&ev.status!=='concluido') semana++; });
-      const ordenados=[...eventos].sort((a,b)=>new Date(a.data)-new Date(b.data));
+      const ordenados = [...eventos].sort((a, b) => {
+  const dataA = a.data || '';
+  const dataB = b.data || '';
+
+  if (dataA !== dataB) {
+    return dataA.localeCompare(dataB);
+  }
+
+  const horaA = a.inicio || '00:00';
+  const horaB = b.inicio || '00:00';
+
+  return horaA.localeCompare(horaB);
+});
 
       ordenados.forEach(ev=>{
         const st=getStatusReal(ev), naSemana=isNaSemanaAtual(ev.data), hoje=isHoje(ev.data);
