@@ -389,6 +389,49 @@
       .form-row, .form-row-3, .adicionais-card-grid { grid-template-columns: 1fr; }
       .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
+
+    /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
+    .concluidos-group-cell {
+      padding: 0 !important;
+      background: rgba(212, 175, 122, 0.06);
+      border-top: 1px solid var(--gold-border);
+      border-bottom: 1px solid var(--gold-border);
+    }
+    .concluidos-group-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px 14px;
+      border: 0;
+      background: transparent;
+      color: var(--dourado);
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+    .concluidos-group-toggle:hover {
+      background: var(--dourado-glow);
+    }
+    .concluidos-group-toggle i {
+      width: 14px;
+      text-align: center;
+      font-size: 11px;
+    }
+    .concluidos-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 23px;
+      height: 23px;
+      padding: 0 7px;
+      border: 1px solid var(--gold-border);
+      border-radius: 20px;
+      color: var(--cinza-claro);
+      font-size: 11px;
+    }
+
   </style>
 </head>
 <body>
@@ -489,6 +532,18 @@
             </tr>
           </thead>
           <tbody id="lista-eventos"></tbody>
+          <tbody id="grupo-concluidos-header" class="hidden">
+            <tr>
+              <td colspan="9" class="concluidos-group-cell">
+                <button type="button" id="btn-toggle-concluidos" class="concluidos-group-toggle" onclick="toggleEventosConcluidos()" aria-expanded="false">
+                  <i id="icone-toggle-concluidos" class="fa-solid fa-chevron-right"></i>
+                  <span>Eventos concluídos</span>
+                  <span id="contador-eventos-concluidos" class="concluidos-count">0</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody id="lista-eventos-concluidos" class="hidden"></tbody>
         </table>
       </div>
     </main>
@@ -690,8 +745,36 @@
     function isHoje(dateStr){ return dateStr === new Date().toISOString().split('T')[0]; }
     function toggleAddonInput(tipo){ if(tipo==='outro'){ const c=document.getElementById('add-check-outro').checked; document.getElementById('add-box-outro').classList.toggle('hidden', !c);} else { const c=document.getElementById('add-check-'+tipo).checked; document.getElementById('add-val-'+tipo).classList.toggle('hidden', !c);} }
 
+    let eventosConcluidosExpandido = false;
+
+    function toggleEventosConcluidos(){
+      eventosConcluidosExpandido = !eventosConcluidosExpandido;
+      atualizarGrupoConcluidos();
+    }
+
+    function atualizarGrupoConcluidos(){
+      const cabecalho = document.getElementById('grupo-concluidos-header');
+      const corpo = document.getElementById('lista-eventos-concluidos');
+      const botao = document.getElementById('btn-toggle-concluidos');
+      const icone = document.getElementById('icone-toggle-concluidos');
+      const contador = document.getElementById('contador-eventos-concluidos');
+      const total = corpo ? corpo.children.length : 0;
+
+      if (!cabecalho || !corpo) return;
+      cabecalho.classList.toggle('hidden', total === 0);
+      corpo.classList.toggle('hidden', total === 0 || !eventosConcluidosExpandido);
+      if (contador) contador.textContent = total;
+      if (botao) botao.setAttribute('aria-expanded', String(eventosConcluidosExpandido && total > 0));
+      if (icone) {
+        icone.classList.toggle('fa-chevron-down', eventosConcluidosExpandido && total > 0);
+        icone.classList.toggle('fa-chevron-right', !(eventosConcluidosExpandido && total > 0));
+      }
+    }
+
     function render(){
       const tbody=document.getElementById('lista-eventos'); tbody.innerHTML='';
+      const concluidosTbody=document.getElementById('lista-eventos-concluidos');
+      concluidosTbody.innerHTML='';
       const busca=document.getElementById('filtro-busca').value.toLowerCase();
       const mes=document.getElementById('filtro-mes').value;
       const periodo=document.getElementById('filtro-periodo').value;
@@ -769,8 +852,15 @@
               <button class="btn-icon btn-delete-ic" onclick="excluirEvento(${ev.id})"><i class="fa-solid fa-trash"></i></button>
             </div>
           </td>`;
-        tbody.appendChild(tr);
+        if(st === 'concluido') concluidosTbody.appendChild(tr);
+        else tbody.appendChild(tr);
       });
+
+      // Ao pesquisar ou filtrar, abre automaticamente a seção se houver concluídos no resultado.
+      if (concluidosTbody.children.length > 0 && (busca || mes || periodo || statusF || contratoF)) {
+        eventosConcluidosExpandido = true;
+      }
+      atualizarGrupoConcluidos();
 
       document.getElementById('kpi-semana').innerText=semana;
       document.getElementById('kpi-fat').innerText=formatMoney(fat);
