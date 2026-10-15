@@ -654,7 +654,38 @@
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('app-shell').classList.remove('hidden');
       carregarDados();
+      autorizarIframes();
     }
+
+    // O HUB é o único ponto de login. Os painéis internos só abrem
+    // quando recebem autorização da janela central já autenticada.
+    function autorizarIframes() {
+      if (!isLogado()) return;
+      [
+        { selector: '#app-contratos iframe', origin: 'https://contratos-brown.vercel.app' },
+        { selector: '#app-impressao iframe', origin: 'https://moldura-app.vercel.app' }
+      ].forEach(destino => {
+        const iframe = document.querySelector(destino.selector);
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'EC_HUB_AUTHORIZED' }, destino.origin);
+        }
+      });
+    }
+
+    window.addEventListener('message', event => {
+      const contrato = document.querySelector('#app-contratos iframe');
+      const impressao = document.querySelector('#app-impressao iframe');
+      const origemContratos = event.origin === 'https://contratos-brown.vercel.app' && contrato && event.source === contrato.contentWindow;
+      const origemImpressao = event.origin === 'https://moldura-app.vercel.app' && impressao && event.source === impressao.contentWindow;
+      if (!origemContratos && !origemImpressao) return;
+      if (event.data?.type === 'EC_HUB_AUTH_REQUEST') {
+        if (isLogado()) event.source.postMessage({ type: 'EC_HUB_AUTHORIZED' }, event.origin);
+        return;
+      }
+      if (event.data?.type === 'EC_HUB_RETURN_TO_HUB') {
+        if (isLogado()) switchApp('gestao');
+      }
+    });
 
     function fazerLogin(e) {
       e.preventDefault();
@@ -689,6 +720,7 @@
 
       const headerActions = document.getElementById('header-actions-gestao');
       headerActions.style.display = (appId === 'gestao') ? 'flex' : 'none';
+      autorizarIframes();
       if (appId === 'contratos') setTimeout(solicitarStatusContratos, 300);
     }
 
