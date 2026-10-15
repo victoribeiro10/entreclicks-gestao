@@ -472,8 +472,9 @@
       </div>
 
       <nav class="hub-nav">
-        <button class="hub-tab active" id="tab-gestao" onclick="switchApp('gestao')"><i class="fa-regular fa-calendar-check"></i> Gestão & Agenda</button>
+        <button class="hub-tab active" id="tab-gestao" onclick="switchApp('gestao')"><i class="fa-regular fa-calendar-check"></i> Gestão e Agenda</button>
         <button class="hub-tab" id="tab-contratos" onclick="switchApp('contratos')"><i class="fa-solid fa-file-signature"></i> Gerador de Contratos</button>
+        <button class="hub-tab" id="tab-mimo" onclick="switchApp('mimo')"><i class="fa-solid fa-gift"></i> Mimo do Anfitrião</button>
         <button class="hub-tab" id="tab-impressao" onclick="switchApp('impressao')"><i class="fa-solid fa-print"></i> Central de Impressão</button>
       </nav>
     </header>
@@ -547,6 +548,20 @@
           <tbody id="lista-eventos-concluidos" class="hidden"></tbody>
         </table>
       </div>
+    </main>
+
+    <!-- APP MIMO DO ANFITRIÃO -->
+    <main id="app-mimo" class="main-container hidden">
+      <div class="section-header"><div><h2 class="section-title"><i class="fa-solid fa-gift" style="color:var(--dourado);"></i> Mimo do Anfitrião</h2><p class="section-subtitle">Acompanhe a escolha, impressão e entrega das fotos incluídas no pacote contratado.</p></div><button class="btn-outline" type="button" onclick="solicitarStatusContratos();setTimeout(renderMimo,500)"><i class="fa-solid fa-rotate"></i> Atualizar contratos</button></div>
+      <section class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">Aguardando escolha</div><div class="kpi-value alert" id="mimo-kpi-aguardando">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Escolha parcial</div><div class="kpi-value gold" id="mimo-kpi-parcial">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Impressão pendente</div><div class="kpi-value" id="mimo-kpi-impressao">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Mimos entregues</div><div class="kpi-value success" id="mimo-kpi-entregue">0</div></div>
+      </section>
+      <div class="filter-bar"><input type="text" id="mimo-filtro-busca" placeholder="Buscar anfitrião..." oninput="renderMimo()" style="min-width:180px;"><select id="mimo-filtro-status" onchange="renderMimo()"><option value="">Todos os status</option><option value="aguardando_escolha">Aguardando escolha</option><option value="escolha_parcial">Escolha parcial</option><option value="selecao_completa">Seleção completa</option><option value="impressao_pendente">Impressão pendente</option><option value="entregue">Entregue</option></select></div>
+      <div class="table-wrapper"><table style="min-width:1000px;"><thead><tr><th>Evento</th><th>Pacote / direito</th><th>Fotos escolhidas</th><th>Status do mimo</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="lista-mimo"></tbody></table></div>
+      <p id="mimo-vazio" class="section-subtitle" style="display:none;text-align:center;padding:24px;">Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.</p>
     </main>
 
     <!-- APP CONTRATOS -->
@@ -662,7 +677,7 @@
     function autorizarIframes() {
       if (!isLogado()) return;
       [
-        { selector: '#app-contratos iframe', origin: 'https://contratos-brown.vercel.app' },
+        { selector: '#app-contratos iframe', origin: 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app' },
         { selector: '#app-impressao iframe', origin: 'https://moldura-app.vercel.app' }
       ].forEach(destino => {
         const iframe = document.querySelector(destino.selector);
@@ -675,7 +690,7 @@
     window.addEventListener('message', event => {
       const contrato = document.querySelector('#app-contratos iframe');
       const impressao = document.querySelector('#app-impressao iframe');
-      const origemContratos = event.origin === 'https://contratos-brown.vercel.app' && contrato && event.source === contrato.contentWindow;
+      const origemContratos = event.origin === 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app' && contrato && event.source === contrato.contentWindow;
       const origemImpressao = event.origin === 'https://moldura-app.vercel.app' && impressao && event.source === impressao.contentWindow;
       if (!origemContratos && !origemImpressao) return;
       if (event.data?.type === 'EC_HUB_AUTH_REQUEST') {
@@ -716,12 +731,14 @@
       document.getElementById('app-gestao').classList.add('hidden');
       document.getElementById('app-contratos').classList.add('hidden');
       document.getElementById('app-impressao').classList.add('hidden');
+      document.getElementById('app-mimo').classList.add('hidden');
       document.getElementById('app-' + appId).classList.remove('hidden');
 
       const headerActions = document.getElementById('header-actions-gestao');
       headerActions.style.display = (appId === 'gestao') ? 'flex' : 'none';
       autorizarIframes();
-      if (appId === 'contratos') setTimeout(solicitarStatusContratos, 300);
+      if (appId === 'contratos' || appId === 'mimo') setTimeout(solicitarStatusContratos, 300);
+      if (appId === 'mimo') setTimeout(renderMimo, 600);
     }
 
     // ===================== GESTÃO =====================
@@ -754,7 +771,7 @@
           valor: Number(ev.valor) || 0,
           deslocamento: Number(ev.deslocamento) || 0
         }
-      }, 'https://contratos-brown.vercel.app');
+      }, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
     }
 
     const hojeObj = new Date();
@@ -765,7 +782,7 @@
     function solicitarStatusContratos() {
       const iframe = document.querySelector('#app-contratos iframe');
       if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'EC_HUB_REQUEST_CONTRACTS' }, 'https://contratos-brown.vercel.app');
+        iframe.contentWindow.postMessage({ type: 'EC_HUB_REQUEST_CONTRACTS' }, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
       }
     }
 
@@ -774,7 +791,7 @@
 
     window.addEventListener('message', (event) => {
       const iframe = document.querySelector('#app-contratos iframe');
-      if (event.origin !== 'https://contratos-brown.vercel.app') return;
+      if (event.origin !== 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app') return;
       if (!iframe || event.source !== iframe.contentWindow) return;
       if (event.data?.type === 'EC_CONTRACT_STATUS_UPDATE' && Array.isArray(event.data.contracts)) {
         contratosPorEvento = {};
@@ -782,6 +799,7 @@
           if (contract.hub_event_id) contratosPorEvento[String(contract.hub_event_id)] = contract;
         });
         render();
+        renderMimo();
         if (vinculacaoContratosAberta) renderListaContratosAntigos();
         return;
       }
@@ -824,7 +842,7 @@
         document.getElementById('lista-contratos-antigos').innerHTML = '<p style="color:var(--alerta);font-size:12px;">O gerador ainda está carregando. Aguarde alguns segundos e tente novamente.</p>';
         return;
       }
-      iframe.contentWindow.postMessage({type:'EC_HUB_REQUEST_LEGACY_CONTRACTS'}, 'https://contratos-brown.vercel.app');
+      iframe.contentWindow.postMessage({type:'EC_HUB_REQUEST_LEGACY_CONTRACTS'}, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
     }
     function fecharVinculacaoContratosAntigos() {
       vinculacaoContratosAberta = false;
@@ -874,7 +892,7 @@
       if (!evento) { alert('Evento não encontrado. Atualize a lista e tente novamente.'); return; }
       if (!confirm('Confirmar vínculo?\n\nContrato: '+(contrato.client_name||'Sem nome')+' ('+dataBRVinculo(contrato.event_date)+')'+'\nEvento: '+evento.cliente+' ('+dataBRVinculo(evento.data)+')'+'\n\nO contrato existente será mantido. Nenhum novo contrato será criado.')) return;
       const iframe=document.querySelector('#app-contratos iframe');
-      iframe.contentWindow.postMessage({type:'EC_HUB_LINK_LEGACY_CONTRACT',token:contrato.token,event_id:String(evento.id)},'https://contratos-brown.vercel.app');
+      iframe.contentWindow.postMessage({type:'EC_HUB_LINK_LEGACY_CONTRACT',token:contrato.token,event_id:String(evento.id)},'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
       const button=select.parentElement.querySelector('button');
       if(button){button.disabled=true;button.textContent='Vinculando...';}
     }
@@ -972,6 +990,92 @@
         icone.classList.toggle('fa-chevron-down', eventosConcluidosExpandido && total > 0);
         icone.classList.toggle('fa-chevron-right', !(eventosConcluidosExpandido && total > 0));
       }
+    }
+
+    function getQtdMimo(ev) {
+      const contrato = contratosPorEvento[String(ev.id)] || {};
+      const nome = String(contrato.package_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+      if (nome.includes('MEMOR')) return 18;
+      if (nome.includes('MOMENT')) return 27;
+      if (nome.includes('ETERNIZE')) return 38;
+      return 0;
+    }
+    function getNomePacoteMimo(ev) {
+      const contrato = contratosPorEvento[String(ev.id)] || {};
+      const nome = String(contrato.package_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+      if (nome.includes('MEMOR')) return 'Memórias';
+      if (nome.includes('MOMENT')) return 'Momentos';
+      if (nome.includes('ETERNIZE')) return 'Eternize';
+      return '';
+    }
+    function getStatusMimo(ev, esperado) {
+      if (ev.mimoStatus) return ev.mimoStatus;
+      const qtd = Number(ev.mimoQtdRecebida) || 0;
+      if (!qtd) return 'aguardando_escolha';
+      if (esperado && qtd < esperado) return 'escolha_parcial';
+      return 'selecao_completa';
+    }
+    function labelStatusMimo(status) {
+      return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',selecao_completa:'Seleção completa',impressao_pendente:'Impressão pendente',entregue:'Entregue'})[status] || 'Aguardando escolha';
+    }
+    function renderMimo() {
+      const tbody = document.getElementById('lista-mimo');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const busca = (document.getElementById('mimo-filtro-busca')?.value || '').toLowerCase().trim();
+      const filtroStatus = document.getElementById('mimo-filtro-status')?.value || '';
+      const concluidos = eventos.filter(ev => getStatusReal(ev) === 'concluido' && contratosPorEvento[String(ev.id)]);
+      let aguardando = 0, parcial = 0, impressao = 0, entregue = 0, mostrados = 0;
+      concluidos.forEach(ev => {
+        if (busca && !String(ev.cliente || '').toLowerCase().includes(busca)) return;
+        const esperado = getQtdMimo(ev);
+        const status = getStatusMimo(ev, esperado);
+        if (filtroStatus && status !== filtroStatus) return;
+        mostrados++;
+        if (status === 'aguardando_escolha') aguardando++;
+        if (status === 'escolha_parcial') parcial++;
+        if (status === 'impressao_pendente') impressao++;
+        if (status === 'entregue') entregue++;
+        const dataFmt = String(ev.data || '').split('-').reverse().join('/');
+        const qtd = Number(ev.mimoQtdRecebida) || 0;
+        const pacote = getNomePacoteMimo(ev);
+        const direito = esperado === 38 ? '37 fotos + 1 especial (38 no total)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
+        const tr = document.createElement('tr');
+        const statusOptions = ['aguardando_escolha','escolha_parcial','selecao_completa','impressao_pendente','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
+        tr.innerHTML =
+          '<td><div class="cliente-nome">' + (ev.cliente || 'Sem nome') + '</div><div class="evento-horario">' + dataFmt + ' · ' + (ev.local || '') + '</div></td>' +
+          '<td><strong>' + (pacote || 'Não identificado') + '</strong><div class="evento-horario">' + direito + '</div>' +
+          (esperado ? '' : '<button class="btn-outline" style="margin-top:6px;padding:5px 8px;" onclick="switchApp(\'contratos\')">Abrir contratos</button>') + '</td>' +
+          '<td style="min-width:145px;"><div style="display:flex;align-items:center;gap:6px;"><input id="mimo-qtd-' + ev.id + '" type="number" min="0" max="' + esperado + '" value="' + qtd + '" style="width:76px;" ' + (!esperado ? 'disabled' : '') + '><span class="evento-horario">/ ' + (esperado || '—') + '</span></div></td>' +
+          '<td style="min-width:175px;"><select id="mimo-status-' + ev.id + '" ' + (!esperado ? 'disabled' : '') + '>' + statusOptions + '</select></td>' +
+          '<td><input id="mimo-obs-' + ev.id + '" type="text" value="' + String(ev.mimoObservacao || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') + '" placeholder="Observação (opcional)" style="min-width:150px;" ' + (!esperado ? 'disabled' : '') + '></td>' +
+          '<td><div class="actions-cell"><button class="btn-gold" style="padding:7px 9px;" onclick="salvarMimo(' + ev.id + ')" ' + (!esperado ? 'disabled' : '') + '>Salvar</button></div></td>';
+        tbody.appendChild(tr);
+      });
+      document.getElementById('mimo-kpi-aguardando').textContent = aguardando;
+      document.getElementById('mimo-kpi-parcial').textContent = parcial;
+      document.getElementById('mimo-kpi-impressao').textContent = impressao;
+      document.getElementById('mimo-kpi-entregue').textContent = entregue;
+      document.getElementById('mimo-vazio').style.display = mostrados ? 'none' : 'block';
+    }
+    async function salvarMimo(id) {
+      const ev = eventos.find(item => String(item.id) === String(id));
+      if (!ev) return;
+      const esperado = getQtdMimo(ev);
+      if (!esperado) { alert('Não foi possível identificar o pacote no contrato vinculado. Abra a aba Contratos e confira o vínculo.'); return; }
+      const qtd = Math.max(0, Math.min(esperado, Number(document.getElementById('mimo-qtd-' + id).value) || 0));
+      ev.mimoQtdRecebida = qtd;
+      ev.mimoStatus = document.getElementById('mimo-status-' + id).value;
+      ev.mimoObservacao = document.getElementById('mimo-obs-' + id).value.trim();
+      if (ev.mimoStatus === 'entregue' && qtd < esperado && !confirm('A quantidade registrada é menor que o direito do pacote. Deseja marcar o mimo como entregue mesmo assim?')) {
+        ev.mimoStatus = qtd === 0 ? 'aguardando_escolha' : 'escolha_parcial';
+        renderMimo();
+        return;
+      }
+      render();
+      renderMimo();
+      await sincronizarComNuvem('editar', ev);
+      renderMimo();
     }
 
     function render(){
@@ -1109,6 +1213,9 @@
         dados.status=original?.status||'agendado';
         dados.obsConclusao=original?.obsConclusao||'';
         dados.calendarEventId=original?.calendarEventId||'';
+        dados.mimoQtdRecebida=original?.mimoQtdRecebida||0;
+        dados.mimoStatus=original?.mimoStatus||'';
+        dados.mimoObservacao=original?.mimoObservacao||'';
         // Atualiza a agenda local imediatamente, inclusive no navegador do celular.
         eventos=eventos.map(ev=>ev.id===dados.id?{...ev,...dados}:ev);
         render();
