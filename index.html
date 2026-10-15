@@ -688,6 +688,7 @@
 
       const headerActions = document.getElementById('header-actions-gestao');
       headerActions.style.display = (appId === 'gestao') ? 'flex' : 'none';
+      if (appId === 'contratos') setTimeout(solicitarStatusContratos, 300);
     }
 
     // ===================== GESTÃO =====================
@@ -706,6 +707,7 @@
         return;
       }
 
+      solicitarStatusContratos();
       iframe.contentWindow.postMessage({
         type: 'EC_HUB_PREFILL_CONTRACT',
         event: {
@@ -725,6 +727,27 @@
     const hojeObj = new Date();
     const dataHojeIso = hojeObj.toISOString().split('T')[0];
     let eventos = JSON.parse(localStorage.getItem('ec_eventos_v8')) || [];
+    let contratosPorEvento = {};
+
+    function solicitarStatusContratos() {
+      const iframe = document.querySelector('#app-contratos iframe');
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'EC_HUB_REQUEST_CONTRACTS' }, 'https://contratos-brown.vercel.app');
+      }
+    }
+
+    window.addEventListener('message', (event) => {
+      const iframe = document.querySelector('#app-contratos iframe');
+      if (event.origin !== 'https://contratos-brown.vercel.app') return;
+      if (!iframe || event.source !== iframe.contentWindow) return;
+      if (event.data?.type !== 'EC_CONTRACT_STATUS_UPDATE' || !Array.isArray(event.data.contracts)) return;
+
+      contratosPorEvento = {};
+      event.data.contracts.forEach(contract => {
+        if (contract.hub_event_id) contratosPorEvento[String(contract.hub_event_id)] = contract;
+      });
+      render();
+    });
 
     function setCloudStatus(status, text) {
       document.getElementById('cloud-indicator').className = 'cloud-status ' + status;
@@ -892,6 +915,7 @@
               <div class="toggle-item"><span>🖼️</span><label class="toggle"><input type="checkbox" ${ev.moldura==='sim'?'checked':''} onchange="toggleCampo(${ev.id},'moldura',this.checked)"><span class="toggle-slider"></span></label></div>
               <div class="toggle-item"><span>📄</span><label class="toggle"><input type="checkbox" ${ev.contrato==='sim'?'checked':''} onchange="toggleCampo(${ev.id},'contrato',this.checked)"><span class="toggle-slider"></span></label></div>
             </div>
+            ${contratosPorEvento[String(ev.id)] ? `<div style="margin-top:5px;font-size:9px;padding:3px 5px;border:1px solid #bfa06a;border-radius:5px;display:inline-block;color:${contratosPorEvento[String(ev.id)].status==='signed'?'#70c99a':contratosPorEvento[String(ev.id)].status==='viewed'?'#e5c778':'#d5d5d5'};">📄 ${contratosPorEvento[String(ev.id)].status==='signed'?'Assinado':contratosPorEvento[String(ev.id)].status==='viewed'?'Visualizado':'Pendente'}</div>` : ''}
           </td>
           <td>
             <div class="actions-cell">
@@ -1002,7 +1026,7 @@
     function exportarCSV(){ if(!eventos.length) return alert('Sem dados'); let csv='\uFEFFData;Cliente;Telefone;Local;Inicio;Termino;Valor Pacote;Deslocamento;Valor Pago;Saldo;Fotos;Moldura;Contrato;Adicionais\n'; eventos.forEach(ev=>{ const saldo=getSaldoRestante(ev); let adds=[]; if(ev.adicionais){ if(ev.adicionais.ima?.ativo)adds.push('Ima'); if(ev.adicionais.livro?.ativo)adds.push('Livro'); if(ev.adicionais.hora?.ativo)adds.push('Hora Extra'); if(ev.adicionais.outro?.ativo)adds.push(ev.adicionais.outro.desc||'Outro'); } csv+=`${ev.data};${ev.cliente};${ev.telefone};${ev.local};${ev.inicio};${ev.termino};${ev.valor};${ev.deslocamento};${ev.pago};${saldo};${ev.status==='concluido'?ev.fotosReais:ev.fotos};${ev.moldura};${ev.contrato};"${adds.join(', ')}"\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`entre_clicks_${new Date().getFullYear()}.csv`; a.click(); }
 
     // boot
-    if (isLogado()) liberarApp();
+    if (isLogado()) { liberarApp(); setTimeout(solicitarStatusContratos, 1500); }
   </script>
 </body>
 </html>
