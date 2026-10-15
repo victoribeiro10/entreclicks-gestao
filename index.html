@@ -997,7 +997,7 @@
       const nome = String(contrato.package_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
       if (nome.includes('MEMOR')) return 18;
       if (nome.includes('MOMENT')) return 27;
-      if (nome.includes('ETERNIZE')) return 37;
+      if (nome.includes('ETERNIZE')) return 38;
       return 0;
     }
     function getNomePacoteMimo(ev) {
@@ -1039,7 +1039,7 @@
         const dataFmt = String(ev.data || '').split('-').reverse().join('/');
         const qtd = Number(ev.mimoQtdRecebida) || 0;
         const pacote = getNomePacoteMimo(ev);
-        const direito = esperado === 37 ? '37 fotos no total (inclui 1 especial)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
+        const direito = esperado === 38 ? '37 fotos + 1 especial (38 no total)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
         const tr = document.createElement('tr');
         const statusOptions = ['aguardando_escolha','escolha_parcial','selecao_completa','impressao_pendente','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
         tr.innerHTML =
