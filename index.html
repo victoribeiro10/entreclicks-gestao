@@ -464,6 +464,7 @@
           <div id="cloud-indicator" class="cloud-status">
             <i class="fa-solid fa-cloud"></i> <span id="cloud-text">Local</span>
           </div>
+          <button onclick="abrirVinculacaoContratosAntigos()" class="btn-outline"><i class="fa-solid fa-link"></i> Vincular contratos antigos</button>
           <button onclick="exportarCSV()" class="btn-outline"><i class="fa-solid fa-file-excel"></i> Exportar</button>
           <button onclick="openModalEvento()" class="btn-gold"><i class="fa-solid fa-plus"></i> Novo Evento</button>
           <button onclick="fazerLogout()" class="btn-outline" title="Sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
@@ -736,17 +737,115 @@
       }
     }
 
+    let contratosAntigosSemVinculo = [];
+    let vinculacaoContratosAberta = false;
+
     window.addEventListener('message', (event) => {
       const iframe = document.querySelector('#app-contratos iframe');
       if (event.origin !== 'https://contratos-brown.vercel.app') return;
       if (!iframe || event.source !== iframe.contentWindow) return;
-      if (event.data?.type !== 'EC_CONTRACT_STATUS_UPDATE' || !Array.isArray(event.data.contracts)) return;
-      contratosPorEvento = {};
-      event.data.contracts.forEach(contract => {
-        if (contract.hub_event_id) contratosPorEvento[String(contract.hub_event_id)] = contract;
-      });
-      render();
+      if (event.data?.type === 'EC_CONTRACT_STATUS_UPDATE' && Array.isArray(event.data.contracts)) {
+        contratosPorEvento = {};
+        event.data.contracts.forEach(contract => {
+          if (contract.hub_event_id) contratosPorEvento[String(contract.hub_event_id)] = contract;
+        });
+        render();
+        if (vinculacaoContratosAberta) renderListaContratosAntigos();
+        return;
+      }
+      if (event.data?.type === 'EC_LEGACY_CONTRACTS_LIST' && Array.isArray(event.data.contracts)) {
+        contratosAntigosSemVinculo = event.data.contracts;
+        renderListaContratosAntigos();
+        return;
+      }
+      if (event.data?.type === 'EC_HUB_LEGACY_LINK_RESULT') {
+        if (event.data.success) {
+          contratosAntigosSemVinculo = contratosAntigosSemVinculo.filter(x => x.token !== event.data.token);
+          alert('Contrato vinculado com sucesso! O status será atualizado na agenda.');
+          renderListaContratosAntigos();
+          solicitarStatusContratos();
+        } else {
+          alert('Não foi possível vincular este contrato. ' + (event.data.error || 'Atualize a lista e tente novamente.'));
+          if (vinculacaoContratosAberta) renderListaContratosAntigos();
+        }
+      }
     });
+
+    function normalizarTextoVinculo(valor) {
+      return String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+    function dataBRVinculo(data) {
+      if (!data) return 'Data não informada';
+      const partes = String(data).split('-');
+      return partes.length === 3 ? partes.reverse().join('/') : data;
+    }
+    function escaparHtmlVinculo(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function abrirVinculacaoContratosAntigos() {
+      vinculacaoContratosAberta = true;
+      document.getElementById('modal-vincular-contratos').classList.remove('hidden');
+      document.getElementById('lista-contratos-antigos').innerHTML = '<p style="color:var(--cinza-suave);font-size:12px;padding:18px 0;">Buscando contratos antigos sem vínculo...</p>';
+      contratosAntigosSemVinculo = [];
+      const iframe = document.querySelector('#app-contratos iframe');
+      if (!iframe?.contentWindow) {
+        document.getElementById('lista-contratos-antigos').innerHTML = '<p style="color:var(--alerta);font-size:12px;">O gerador ainda está carregando. Aguarde alguns segundos e tente novamente.</p>';
+        return;
+      }
+      iframe.contentWindow.postMessage({type:'EC_HUB_REQUEST_LEGACY_CONTRACTS'}, 'https://contratos-brown.vercel.app');
+    }
+    function fecharVinculacaoContratosAntigos() {
+      vinculacaoContratosAberta = false;
+      document.getElementById('modal-vincular-contratos').classList.add('hidden');
+    }
+    function renderListaContratosAntigos() {
+      const container = document.getElementById('lista-contratos-antigos');
+      if (!container || !vinculacaoContratosAberta) return;
+      if (!contratosAntigosSemVinculo.length) {
+        container.innerHTML = '<p style="color:var(--sucesso);font-size:12px;padding:18px 0;">Nenhum contrato antigo pendente de vínculo.</p>';
+        return;
+      }
+      const eventosDisponiveis = eventos.filter(ev => !contratosPorEvento[String(ev.id)]);
+      const html = contratosAntigosSemVinculo.map((contrato, index) => {
+        const nome = normalizarTextoVinculo(contrato.client_name);
+        const score = ev => (normalizarTextoVinculo(ev.cliente) === nome && nome ? 10 : 0) +
+          (ev.data && contrato.event_date && ev.data === contrato.event_date ? 8 : 0) +
+          (normalizarTextoVinculo(contrato.event_location_name) && normalizarTextoVinculo(ev.local).includes(normalizarTextoVinculo(contrato.event_location_name)) ? 2 : 0);
+        const candidatos = [...eventosDisponiveis].sort((a,b) => score(b)-score(a));
+        const melhorScore = candidatos.length ? score(candidatos[0]) : 0;
+        const options = candidatos.map(ev => '<option value="'+escaparHtmlVinculo(ev.id)+'">'+escaparHtmlVinculo(ev.cliente)+' — '+dataBRVinculo(ev.data)+' — '+escaparHtmlVinculo(ev.local||'Local não informado')+'</option>').join('');
+        return '<div class="legacy-contract-card" style="border:1px solid var(--gold-border-soft);border-radius:8px;padding:14px;margin-bottom:10px;background:var(--preto-2);">'+
+          '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;"><strong style="color:#fff;font-size:13px;">'+escaparHtmlVinculo(contrato.client_name||'Cliente sem nome')+'</strong>'+
+          '<span class="badge '+(contrato.status==='signed'?'badge-concluido':'badge-agendado')+'">'+(contrato.status==='signed'?'Assinado':contrato.status==='viewed'?'Visualizado':'Pendente')+'</span></div>'+
+          '<div style="font-size:11px;color:var(--cinza-suave);margin-bottom:10px;">Data do contrato: '+dataBRVinculo(contrato.event_date)+' • Local: '+escaparHtmlVinculo(contrato.event_location_name||'Não informado')+'</div>'+
+          '<label for="legacy-event-'+index+'">Vincular ao evento da agenda</label><select id="legacy-event-'+index+'" style="margin:5px 0 10px;" '+(candidatos.length?'':'disabled')+'>'+
+          (candidatos.length?'<option value="">Selecione o evento correto...</option>'+options:'<option value="">Nenhum evento disponível</option>')+'</select>'+
+          (melhorScore>=18?'<div style="font-size:10px;color:var(--sucesso);margin-bottom:8px;">Sugestão: nome e data coincidem. Confira antes de confirmar.</div>':(melhorScore>0?'<div style="font-size:10px;color:var(--alerta);margin-bottom:8px;">Possível correspondência. Confira nome, data e local.</div>':''))+
+          '<button class="btn-gold" type="button" onclick="confirmarVinculoContratoAntigo('+index+')" '+(candidatos.length?'':'disabled')+'><i class="fa-solid fa-link"></i> Confirmar vínculo</button></div>';
+      }).join('');
+      container.innerHTML = html;
+      contratosAntigosSemVinculo.forEach((contrato,index) => {
+        const select = document.getElementById('legacy-event-'+index);
+        const nome = normalizarTextoVinculo(contrato.client_name);
+        const candidatos = [...eventosDisponiveis].sort((a,b) => {
+          const score = ev => (normalizarTextoVinculo(ev.cliente)===nome && nome?10:0)+(ev.data&&contrato.event_date&&ev.data===contrato.event_date?8:0);
+          return score(b)-score(a);
+        });
+        const melhor = candidatos[0];
+        if (melhor && ((normalizarTextoVinculo(melhor.cliente)===nome && nome)||(melhor.data&&contrato.event_date&&melhor.data===contrato.event_date))) select.value=String(melhor.id);
+      });
+    }
+    function confirmarVinculoContratoAntigo(index) {
+      const contrato=contratosAntigosSemVinculo[index], select=document.getElementById('legacy-event-'+index);
+      if (!contrato || !select || !select.value) { alert('Selecione o evento correto antes de confirmar.'); return; }
+      const evento=eventos.find(ev=>String(ev.id)===String(select.value));
+      if (!evento) { alert('Evento não encontrado. Atualize a lista e tente novamente.'); return; }
+      if (!confirm('Confirmar vínculo?\n\nContrato: '+(contrato.client_name||'Sem nome')+' ('+dataBRVinculo(contrato.event_date)+')'+'\nEvento: '+evento.cliente+' ('+dataBRVinculo(evento.data)+')'+'\n\nO contrato existente será mantido. Nenhum novo contrato será criado.')) return;
+      const iframe=document.querySelector('#app-contratos iframe');
+      iframe.contentWindow.postMessage({type:'EC_HUB_LINK_LEGACY_CONTRACT',token:contrato.token,event_id:String(evento.id)},'https://contratos-brown.vercel.app');
+      const button=select.parentElement.querySelector('button');
+      if(button){button.disabled=true;button.textContent='Vinculando...';}
+    }
 
     function setCloudStatus(status, text) {
       document.getElementById('cloud-indicator').className = 'cloud-status ' + status;
@@ -1027,5 +1126,13 @@
     // boot
     if (isLogado()) { liberarApp(); setTimeout(solicitarStatusContratos, 1500); }
   </script>
+  <div id="modal-vincular-contratos" class="modal-overlay hidden" style="z-index:100;">
+    <div class="modal-box" style="max-width:760px;">
+      <div class="modal-header"><h3 class="modal-title"><i class="fa-solid fa-link"></i> Vincular contratos antigos</h3><i class="fa-solid fa-xmark" onclick="fecharVinculacaoContratosAntigos()" style="cursor:pointer;color:var(--cinza-suave);"></i></div>
+      <p style="font-size:12px;color:var(--cinza-suave);line-height:1.6;margin-bottom:14px;">Confira cada contrato e selecione o evento correspondente. A sugestão considera nome e data, mas o vínculo só será salvo depois da sua confirmação. O contrato e o link de assinatura serão preservados.</p>
+      <div id="lista-contratos-antigos"><p style="color:var(--cinza-suave);font-size:12px;">Carregando...</p></div>
+      <div class="modal-actions"><button type="button" class="btn-cancel" onclick="fecharVinculacaoContratosAntigos()">Fechar</button><button type="button" class="btn-outline" onclick="abrirVinculacaoContratosAntigos()"><i class="fa-solid fa-rotate"></i> Atualizar lista</button></div>
+    </div>
+  </div>
 </body>
 </html>
