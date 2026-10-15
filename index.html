@@ -691,6 +691,37 @@
     }
 
     // ===================== GESTÃO =====================
+    // Envia os dados do evento selecionado ao gerador de contratos, sem expor dados na URL.
+    function gerarContratoEvento(id) {
+      const ev = eventos.find(item => String(item.id) === String(id));
+      if (!ev) {
+        alert('Não foi possível localizar este evento na agenda.');
+        return;
+      }
+
+      switchApp('contratos');
+      const iframe = document.querySelector('#app-contratos iframe');
+      if (!iframe || !iframe.contentWindow) {
+        alert('O gerador de contratos ainda está carregando. Tente novamente em alguns segundos.');
+        return;
+      }
+
+      iframe.contentWindow.postMessage({
+        type: 'EC_HUB_PREFILL_CONTRACT',
+        event: {
+          id: String(ev.id),
+          cliente: ev.cliente || '',
+          telefone: ev.telefone || '',
+          data: ev.data || '',
+          local: ev.local || '',
+          inicio: ev.inicio || '',
+          termino: ev.termino || '',
+          valor: Number(ev.valor) || 0,
+          deslocamento: Number(ev.deslocamento) || 0
+        }
+      }, 'https://contratos-brown.vercel.app');
+    }
+
     const hojeObj = new Date();
     const dataHojeIso = hojeObj.toISOString().split('T')[0];
     let eventos = JSON.parse(localStorage.getItem('ec_eventos_v8')) || [];
@@ -864,6 +895,7 @@
           </td>
           <td>
             <div class="actions-cell">
+              <button class="btn-icon btn-edit-ic" title="Gerar contrato com os dados deste evento" onclick="gerarContratoEvento(${ev.id})"><i class="fa-solid fa-file-contract"></i></button>
               ${st!=='concluido'?`<button class="btn-pagamento-sm" onclick="openModalPagamento(${ev.id})">$</button>`:''}
               ${(dias<=0||st==='quitado')&&st!=='concluido'?`<button class="btn-concluir-sm" onclick="openModalConcluir(${ev.id})">✓</button>`:''}
               <button class="btn-icon btn-whatsapp-ic" onclick="abrirWhatsApp('${ev.telefone}','${ev.cliente}','${dataFmt}')"><i class="fa-brands fa-whatsapp"></i></button>
