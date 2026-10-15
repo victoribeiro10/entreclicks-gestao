@@ -1126,13 +1126,6 @@
     // boot
     if (isLogado()) { liberarApp(); setTimeout(solicitarStatusContratos, 1500); }
   </script>
-  <div id="modal-vincular-contratos" class="modal-overlay hidden" style="z-index:100;">
-    <div class="modal-box" style="max-width:760px;">
-      <div class="modal-header"><h3 class="modal-title"><i class="fa-solid fa-link"></i> Vincular contratos antigos</h3><i class="fa-solid fa-xmark" onclick="fecharVinculacaoContratosAntigos()" style="cursor:pointer;color:var(--cinza-suave);"></i></div>
-      <p style="font-size:12px;color:var(--cinza-suave);line-height:1.6;margin-bottom:14px;">Confira cada contrato e selecione o evento correspondente. A sugestão considera nome e data, mas o vínculo só será salvo depois da sua confirmação. O contrato e o link de assinatura serão preservados.</p>
-      <div id="lista-contratos-antigos"><p style="color:var(--cinza-suave);font-size:12px;">Carregando...</p></div>
-      <div class="modal-actions"><button type="button" class="btn-cancel" onclick="fecharVinculacaoContratosAntigos()">Fechar</button><button type="button" class="btn-outline" onclick="abrirVinculacaoContratosAntigos()"><i class="fa-solid fa-rotate"></i> Atualizar lista</button></div>
-    </div>
-  </div>
+  <div id="modal-vincular-contratos" class="modal-overlay hidden" style="z-index:100;"><div class="modal-box" style="max-width:760px;"><div class="modal-header"><h3 class="modal-title"><i class="fa-solid fa-link"></i> Vincular contratos antigos</h3><i class="fa-solid fa-xmark" onclick="fecharVinculacaoContratosAntigos()" style="cursor:pointer;color:var(--cinza-suave);"></i></div><p style="font-size:12px;color:var(--cinza-suave);line-height:1.6;margin-bottom:14px;">Confira cada contrato e selecione o evento correspondente. A sugestão considera nome e data, mas o vínculo só será salvo depois da sua confirmação. O contrato e o link de assinatura serão preservados.</p><div id="lista-contratos-antigos"><p style="color:var(--cinza-suave);font-size:12px;">Carregando...</p></div><div class="modal-actions"><button type="button" class="btn-cancel" onclick="fecharVinculacaoContratosAntigos()">Fechar</button><button type="button" class="btn-outline" onclick="abrirVinculacaoContratosAntigos()"><i class="fa-solid fa-rotate"></i> Atualizar lista</button></div></div></div>
 </body>
 </html>
