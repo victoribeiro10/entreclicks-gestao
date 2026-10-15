@@ -741,7 +741,6 @@
       if (event.origin !== 'https://contratos-brown.vercel.app') return;
       if (!iframe || event.source !== iframe.contentWindow) return;
       if (event.data?.type !== 'EC_CONTRACT_STATUS_UPDATE' || !Array.isArray(event.data.contracts)) return;
-
       contratosPorEvento = {};
       event.data.contracts.forEach(contract => {
         if (contract.hub_event_id) contratosPorEvento[String(contract.hub_event_id)] = contract;
