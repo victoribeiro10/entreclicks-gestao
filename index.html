@@ -735,6 +735,25 @@
       }
     }
 
+    // Máscara automática para telefones brasileiros (fixo com 10 dígitos ou celular com 11).
+    function formatarTelefone(valor){
+      const digitos = String(valor || '').replace(/\D/g, '').slice(0, 11);
+      if (!digitos) return '';
+      if (digitos.length <= 2) return '(' + digitos;
+      const ddd = digitos.slice(0, 2);
+      const numero = digitos.slice(2);
+      if (digitos.length <= 6) return '(' + ddd + ') ' + numero;
+      if (digitos.length <= 10) return '(' + ddd + ') ' + numero.slice(0, 4) + '-' + numero.slice(4);
+      return '(' + ddd + ') ' + numero.slice(0, 5) + '-' + numero.slice(5);
+    }
+
+    function configurarMascaraTelefone(){
+      const campo = document.getElementById('ev-telefone');
+      if (!campo || campo.dataset.mascaraConfigurada === 'sim') return;
+      campo.dataset.mascaraConfigurada = 'sim';
+      campo.addEventListener('input', () => { campo.value = formatarTelefone(campo.value); });
+      campo.addEventListener('blur', () => { campo.value = formatarTelefone(campo.value); });
+    }
     function formatMoney(v){ return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
     function calcularTotalAdicionais(a){ if(!a) return 0; let t=0; if(a.ima?.ativo)t+=+a.ima.valor||0; if(a.livro?.ativo)t+=+a.livro.valor||0; if(a.hora?.ativo)t+=+a.hora.valor||0; if(a.outro?.ativo)t+=+a.outro.valor||0; return t; }
     function getValorTotal(ev){ return ev.valor + calcularTotalAdicionais(ev.adicionais) + (ev.deslocamento||0); }
@@ -831,7 +850,7 @@
             <div>${dataFmt}</div><div class="evento-horario">${ev.inicio} - ${ev.termino}</div>
             ${hoje?`<span class="badge-hoje"><i class="fa-solid fa-bolt"></i> HOJE</span>`:(naSemana&&st!=='concluido'?`<span class="badge-semana"><i class="fa-solid fa-star"></i> SEMANA</span>`:'')}
           </td>
-          <td><div class="cliente-nome">${ev.cliente}</div><div class="cliente-tel">${ev.telefone}</div></td>
+          <td><div class="cliente-nome">${ev.cliente}</div><div class="cliente-tel">${formatarTelefone(ev.telefone)}</div></td>
           <td><a class="local-link" href="${urlMaps}" target="_blank"><i class="fa-solid fa-location-dot local-icon"></i><span class="evento-local">${ev.local}</span></a></td>
           <td><div style="font-weight:500;">${formatMoney(ev.valor)}</div>${badges?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">${badges}</div>`:''}${ev.deslocamento>0?`<div style="font-size:9px;color:var(--alerta);">Deslocamento: +${formatMoney(ev.deslocamento)}</div>`:''}</td>
           <td><div class="valor-total">${formatMoney(total)}</div><div class="pagamento-cell"><span class="pago-info">Pago: ${formatMoney(ev.pago||0)}</span>${saldo>0?`<span class="saldo-restante ${alerta?'alerta-cobranca':''}">Resta: ${formatMoney(saldo)}</span>`:`<span style="font-size:9px;color:var(--sucesso);font-weight:600;">✓ Quitado</span>`}</div></td>
@@ -884,7 +903,7 @@
       };
       const dados={
         cliente:document.getElementById('ev-cliente').value,
-        telefone:document.getElementById('ev-telefone').value,
+        telefone:formatarTelefone(document.getElementById('ev-telefone').value),
         data:document.getElementById('ev-data').value,
         local:document.getElementById('ev-local').value,
         inicio:document.getElementById('ev-inicio').value,
@@ -924,7 +943,7 @@
       document.getElementById('btn-salvar').innerText='Atualizar Evento';
       document.getElementById('ev-id').value=ev.id;
       document.getElementById('ev-cliente').value=ev.cliente;
-      document.getElementById('ev-telefone').value=ev.telefone;
+      document.getElementById('ev-telefone').value=formatarTelefone(ev.telefone);
       document.getElementById('ev-data').value=ev.data;
       document.getElementById('ev-local').value=ev.local;
       document.getElementById('ev-inicio').value=ev.inicio;
