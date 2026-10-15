@@ -677,7 +677,7 @@
     function autorizarIframes() {
       if (!isLogado()) return;
       [
-        { selector: '#app-contratos iframe', origin: 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app' },
+        { selector: '#app-contratos iframe', origin: 'https://contratos-brown.vercel.app' },
         { selector: '#app-impressao iframe', origin: 'https://moldura-app.vercel.app' }
       ].forEach(destino => {
         const iframe = document.querySelector(destino.selector);
@@ -690,7 +690,7 @@
     window.addEventListener('message', event => {
       const contrato = document.querySelector('#app-contratos iframe');
       const impressao = document.querySelector('#app-impressao iframe');
-      const origemContratos = event.origin === 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app' && contrato && event.source === contrato.contentWindow;
+      const origemContratos = event.origin === 'https://contratos-brown.vercel.app' && contrato && event.source === contrato.contentWindow;
       const origemImpressao = event.origin === 'https://moldura-app.vercel.app' && impressao && event.source === impressao.contentWindow;
       if (!origemContratos && !origemImpressao) return;
       if (event.data?.type === 'EC_HUB_AUTH_REQUEST') {
@@ -771,7 +771,7 @@
           valor: Number(ev.valor) || 0,
           deslocamento: Number(ev.deslocamento) || 0
         }
-      }, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
+      }, 'https://contratos-brown.vercel.app');
     }
 
     const hojeObj = new Date();
@@ -782,7 +782,7 @@
     function solicitarStatusContratos() {
       const iframe = document.querySelector('#app-contratos iframe');
       if (iframe?.contentWindow) {
-        iframe.contentWindow.postMessage({ type: 'EC_HUB_REQUEST_CONTRACTS' }, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
+        iframe.contentWindow.postMessage({ type: 'EC_HUB_REQUEST_CONTRACTS' }, 'https://contratos-brown.vercel.app');
       }
     }
 
@@ -791,7 +791,7 @@
 
     window.addEventListener('message', (event) => {
       const iframe = document.querySelector('#app-contratos iframe');
-      if (event.origin !== 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app') return;
+      if (event.origin !== 'https://contratos-brown.vercel.app') return;
       if (!iframe || event.source !== iframe.contentWindow) return;
       if (event.data?.type === 'EC_CONTRACT_STATUS_UPDATE' && Array.isArray(event.data.contracts)) {
         contratosPorEvento = {};
@@ -842,7 +842,7 @@
         document.getElementById('lista-contratos-antigos').innerHTML = '<p style="color:var(--alerta);font-size:12px;">O gerador ainda está carregando. Aguarde alguns segundos e tente novamente.</p>';
         return;
       }
-      iframe.contentWindow.postMessage({type:'EC_HUB_REQUEST_LEGACY_CONTRACTS'}, 'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
+      iframe.contentWindow.postMessage({type:'EC_HUB_REQUEST_LEGACY_CONTRACTS'}, 'https://contratos-brown.vercel.app');
     }
     function fecharVinculacaoContratosAntigos() {
       vinculacaoContratosAberta = false;
@@ -892,7 +892,7 @@
       if (!evento) { alert('Evento não encontrado. Atualize a lista e tente novamente.'); return; }
       if (!confirm('Confirmar vínculo?\n\nContrato: '+(contrato.client_name||'Sem nome')+' ('+dataBRVinculo(contrato.event_date)+')'+'\nEvento: '+evento.cliente+' ('+dataBRVinculo(evento.data)+')'+'\n\nO contrato existente será mantido. Nenhum novo contrato será criado.')) return;
       const iframe=document.querySelector('#app-contratos iframe');
-      iframe.contentWindow.postMessage({type:'EC_HUB_LINK_LEGACY_CONTRACT',token:contrato.token,event_id:String(evento.id)},'https://contratos-git-feat-mimo-anfitriao-hub-entreclicks-projects.vercel.app');
+      iframe.contentWindow.postMessage({type:'EC_HUB_LINK_LEGACY_CONTRACT',token:contrato.token,event_id:String(evento.id)},'https://contratos-brown.vercel.app');
       const button=select.parentElement.querySelector('button');
       if(button){button.disabled=true;button.textContent='Vinculando...';}
     }
