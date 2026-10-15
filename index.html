@@ -832,7 +832,7 @@
           return score(b)-score(a);
         });
         const melhor = candidatos[0];
-        if (melhor && ((normalizarTextoVinculo(melhor.cliente)===nome && nome)||(melhor.data&&contrato.event_date&&melhor.data===contrato.event_date))) select.value=String(melhor.id);
+        if (melhor && normalizarTextoVinculo(melhor.cliente)===nome && nome && melhor.data && contrato.event_date && melhor.data===contrato.event_date) select.value=String(melhor.id);
       });
     }
     function confirmarVinculoContratoAntigo(index) {
