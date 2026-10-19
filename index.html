@@ -625,6 +625,11 @@
     @media(max-width:900px){.agenda-dashboard-layout{grid-template-columns:1fr;}.upcoming-panel{min-height:0;}.agenda-dashboard-layout .calendar-panel{margin-bottom:0;}}
     @media(max-width:640px){.agenda-hero h1{font-size:25px;}.agenda-hero{margin-bottom:18px;}.upcoming-panel{padding:14px;border-radius:12px;}}
 
+
+    .agenda-list-mode-actions {display:flex;justify-content:flex-end;align-items:center;margin:0 0 12px;}
+    .agenda-list-mode-actions .calendar-view-btn {font-size:11px;padding:10px 14px;}
+    @media(max-width:640px){.agenda-list-mode-actions{justify-content:stretch}.agenda-list-mode-actions .calendar-view-btn{width:100%;}}
+
   </style>
 </head>
 <body>
@@ -749,6 +754,9 @@
       </aside>
       </div>
 
+      <div id="agenda-list-mode-actions" class="agenda-list-mode-actions hidden">
+        <button type="button" class="calendar-view-btn active" onclick="alternarVisaoAgenda('calendario')"><i class="fa-regular fa-calendar"></i> Voltar ao calendário</button>
+      </div>
       <div class="section-header" id="agenda-list-heading">
         <div>
           <h2 class="section-title">Agenda Executiva</h2>
@@ -1355,6 +1363,8 @@
       calendario.classList.toggle('hidden', visaoAgenda !== 'calendario');
       document.getElementById('btn-visao-calendario').classList.toggle('active', visaoAgenda === 'calendario');
       document.getElementById('btn-visao-lista').classList.toggle('active', visaoAgenda === 'lista');
+      const voltarCalendario = document.getElementById('agenda-list-mode-actions');
+      if (voltarCalendario) voltarCalendario.classList.toggle('hidden', visaoAgenda !== 'lista');
     }
     function escaparTextoCalendario(valor) {
       return String(valor ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
