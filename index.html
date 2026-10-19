@@ -6,7 +6,7 @@
   <title>HUB Entre Clicks • Central do Administrador</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400;1,600;700&family=Pacifico&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -487,6 +487,109 @@
       border-radius: 20px;
       color: var(--cinza-claro);
       font-size: 11px;
+    }
+
+
+    /* Refinamento visual inspirado na prévia aprovada — sem alterar a lógica do HUB */
+    :root {
+      --preto-1:#0b0c0f;
+      --preto-2:#101115;
+      --grafite:#121419;
+      --grafite-input:#0d0f13;
+      --dourado:#d4af7a;
+      --dourado-hover:#e4c18b;
+      --dourado-glow:rgba(212,175,122,.12);
+      --gold-border:rgba(212,175,122,.32);
+      --gold-border-soft:#282c34;
+      --cinza-suave:#969daa;
+      --cinza-claro:#f0f1f4;
+    }
+    body {font-family:'DM Sans',sans-serif;background:radial-gradient(ellipse at 50% -25%,#24202a 0%,#0b0c0f 55%);color:#f0f1f4;}
+    .header {background:rgba(15,16,19,.96);border-bottom:1px solid #292a2d;padding:12px 20px 10px;backdrop-filter:blur(18px);}
+    .header-container {max-width:1600px;gap:14px;}
+    .brand-title {letter-spacing:0;}
+    .brand-title-logo {min-height:44px;}
+    .brand-logo {width:190px;max-width:42vw;max-height:52px;object-fit:contain;object-position:left center;}
+    .brand-subtitle {font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1.4px;color:#9a8867;margin-top:1px;}
+    .header-actions {gap:8px;flex-wrap:wrap;}
+    .hub-nav {max-width:1600px;margin-top:12px;gap:8px;}
+    .hub-tab {border-color:#303139;background:#15161b;border-radius:9px;letter-spacing:.45px;padding:8px 12px;}
+    .hub-tab.active {background:rgba(212,175,122,.10);border-color:#d4af7a;box-shadow:none;}
+    .btn-gold,.btn-outline {border-radius:9px;letter-spacing:.45px;}
+    .btn-outline {border-color:#34353b;background:#15161b;}
+    .main-container {max-width:1600px;padding:26px 28px 40px;}
+    .kpi-grid {gap:13px;margin-bottom:22px;}
+    .kpi-card {border-color:#282c34;border-radius:13px;background:linear-gradient(145deg,#17191f,#111318);padding:16px 17px;box-shadow:none;}
+    .kpi-card:nth-child(1){border-top:2px solid #57c8a5;}
+    .kpi-card:nth-child(2){border-top:2px solid #d4af7a;}
+    .kpi-card:nth-child(3){border-top:2px solid #f0ad62;}
+    .kpi-card:nth-child(4){border-top:2px solid #b99af7;}
+    .kpi-card::before {display:none;}
+    .kpi-label {font-size:11px;color:#969daa;}
+    .kpi-value {font-size:25px;letter-spacing:-.6px;}
+    .filter-bar {gap:8px;margin-bottom:14px;}
+    .filter-bar input,.filter-bar select {background:#121419;border-color:#30343c;border-radius:8px;padding:9px 11px;}
+    .calendar-panel {background:rgba(18,20,25,.96);border:1px solid #282c34;border-radius:15px;padding:0;overflow:hidden;box-shadow:0 14px 40px #00000016;}
+    .calendar-top {padding:20px 20px 15px;margin-bottom:0;border-bottom:1px solid #282c34;}
+    .calendar-month-label {font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.4px;min-width:0;text-align:left;}
+    .calendar-month-controls {gap:8px;}
+    .calendar-nav-btn {border-color:#30343c;background:#1a1c22;border-radius:8px;color:#c5c9d2;}
+    .calendar-actions {gap:6px;}
+    .calendar-view-btn {border-color:#30343c;background:#1a1c22;border-radius:8px;padding:8px 10px;letter-spacing:.3px;}
+    .calendar-view-btn.active {color:#d4af7a;border-color:#d4af7a;background:rgba(212,175,122,.12);}
+    .calendar-month-kpis {padding:14px 20px 0;gap:12px;}
+    .calendar-month-kpi {border-color:#282c34;border-radius:10px;background:linear-gradient(145deg,#17191f,#111318);}
+    .calendar-month-kpi-label {letter-spacing:.4px;text-transform:none;font-size:10px;}
+    .calendar-month-kpi-value {font-size:22px;}
+    .calendar-legend {padding:13px 20px 15px;margin:0;border-bottom:1px solid #282c34;gap:15px;}
+    .calendar-scroll {padding:0;}
+    .calendar-weekdays,.calendar-grid {min-width:0;}
+    .calendar-weekdays {border:0;border-radius:0;border-bottom:1px solid #282c34;}
+    .calendar-weekday {background:#111318;color:#7f8794;border:0;padding:12px 4px;font-weight:500;letter-spacing:.8px;}
+    .calendar-grid {border:0;}
+    .calendar-day {min-height:112px;padding:8px 7px;border-right:1px solid #252830;border-bottom:1px solid #252830;background:transparent;}
+    .calendar-day:nth-child(7n) {border-right:0;}
+    .calendar-day.other-month {background:rgba(0,0,0,.12);}
+    .calendar-day.today {background:rgba(212,175,122,.035);box-shadow:inset 0 0 0 1px rgba(212,175,122,.25);}
+    .calendar-day-number {color:#c9cdd5;font-size:11px;font-weight:500;margin-bottom:7px;}
+    .calendar-day.today .calendar-day-number {color:#17130e;}
+    .calendar-event {border-radius:5px;padding:5px 5px 5px 7px;margin-bottom:4px;border-left-width:3px;}
+    .calendar-event-time {font-size:9px;font-weight:500;margin-bottom:3px;}
+    .calendar-event-name {font-size:10px;line-height:1.3;font-weight:600;}
+    .calendar-event.status-quitado,.calendar-event.status-concluido {border-left-color:#57c8a5;background:rgba(87,200,165,.12);color:#d1f5e7;}
+    .calendar-event.status-semana {border-left-color:#68b7f4;background:rgba(104,183,244,.12);color:#d2ecff;}
+    .calendar-event.status-atrasado {border-left-color:#e05d5d;background:rgba(224,93,93,.12);color:#ffcaca;}
+    .calendar-empty {padding:28px 14px;color:#969daa;}
+    .section-title {font-family:'DM Sans',sans-serif;font-size:17px;}
+    .table-wrapper {border-color:#282c34;border-radius:12px;}
+    @media(max-width:900px) {
+      .main-container {padding:22px 16px 32px;}
+      .header-container {align-items:flex-start;}
+      .header-actions {justify-content:flex-start;}
+      .calendar-day {min-height:94px;}
+    }
+    @media(max-width:640px) {
+      .header {padding:10px 12px;}
+      .brand-logo {width:155px;max-width:52vw;max-height:44px;}
+      .main-container {padding:18px 12px 28px;}
+      .kpi-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+      .kpi-card {padding:12px;}
+      .kpi-value {font-size:21px;}
+      .calendar-panel {padding:0;}
+      .calendar-top {padding:15px 12px 12px;align-items:flex-start;}
+      .calendar-month-controls {width:100%;justify-content:space-between;}
+      .calendar-month-label {font-size:17px;flex:1;text-align:center;}
+      .calendar-actions {width:100%;}
+      .calendar-view-btn {flex:1;padding:8px 6px;font-size:9px;}
+      .calendar-month-kpis {padding:12px 12px 0;gap:8px;}
+      .calendar-month-kpi {padding:10px;}
+      .calendar-month-kpi-value {font-size:17px;}
+      .calendar-legend {padding:12px;gap:9px;}
+      .calendar-weekday {font-size:8px;padding:10px 1px;letter-spacing:0;}
+      .calendar-day {min-height:76px;padding:5px 3px;}
+      .calendar-event {padding:5px 3px;border-left-width:2px;}
+      .calendar-event-time {display:none;}
+      .calendar-event-name {font-size:9px;}
     }
 
   </style>
