@@ -630,6 +630,10 @@
     .agenda-list-mode-actions .calendar-view-btn {font-size:11px;padding:10px 14px;}
     @media(max-width:640px){.agenda-list-mode-actions{justify-content:stretch}.agenda-list-mode-actions .calendar-view-btn{width:100%;}}
 
+
+    #ev-tipo-evento {width:100%;background:var(--grafite-input);border:1px solid var(--gold-border-soft);color:#fff;padding:10px 12px;border-radius:var(--radius-sm);font-size:12px;outline:none;}
+    #ev-tipo-evento:focus {border-color:var(--dourado);}
+
   </style>
 </head>
 <body>
@@ -655,7 +659,6 @@
       <div class="header-container">
         <div>
           <div class="brand-title brand-title-logo"><img class="brand-logo" src="https://scwznirvzwrphztvopbz.supabase.co/storage/v1/object/public/logos/logo-horizontal.png" alt="EntreClicks" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><span class="brand-logo-fallback" style="display:none;">ENTRE CLICKS</span></div>
-          <div class="brand-subtitle">hub administrativo</div>
         </div>
 
         <div class="header-actions" id="header-actions-gestao">
@@ -841,7 +844,20 @@
         </div>
         <div class="modal-section-title">Dados do Evento</div>
         <div class="form-row">
+          <div class="form-group"><label>Tipo de Evento</label>
+            <select id="ev-tipo-evento" required>
+              <option value="aniversario">Aniversário</option>
+              <option value="casamento">Casamento</option>
+              <option value="corporativo">Corporativo</option>
+              <option value="15 anos">15 anos</option>
+              <option value="infantil">Infantil</option>
+              <option value="batizado">Batizado</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
           <div class="form-group"><label>Data do Evento</label><input type="date" id="ev-data" required></div>
+        </div>
+        <div class="form-row">
           <div class="form-group"><label>Local da Festa (Nome, Cidade)</label><input type="text" id="ev-local" required placeholder="Ex: Cerimonial Palace, Cachoeiro"></div>
         </div>
         <div class="form-row">
@@ -1571,6 +1587,7 @@
       const dados={
         cliente:document.getElementById('ev-cliente').value,
         telefone:formatarTelefone(document.getElementById('ev-telefone').value),
+        tipoEvento:document.getElementById('ev-tipo-evento').value,
         data:document.getElementById('ev-data').value,
         local:document.getElementById('ev-local').value,
         inicio:document.getElementById('ev-inicio').value,
@@ -1614,6 +1631,7 @@
       document.getElementById('ev-id').value=ev.id;
       document.getElementById('ev-cliente').value=ev.cliente;
       document.getElementById('ev-telefone').value=formatarTelefone(ev.telefone);
+      document.getElementById('ev-tipo-evento').value=ev.tipoEvento||'outro';
       document.getElementById('ev-data').value=ev.data;
       document.getElementById('ev-local').value=ev.local;
       document.getElementById('ev-inicio').value=ev.inicio;
