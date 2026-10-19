@@ -636,6 +636,9 @@
 
 
     /* Na lista completa, recolhe a coluna lateral para a tabela usar toda a largura. */
+    .filter-bar.calendar-list-hidden {display:none !important;}
+    .privacy-toggle {background:transparent;border:1px solid var(--gold-border-soft);color:var(--dourado);border-radius:6px;padding:2px 7px;margin-left:7px;cursor:pointer;font-size:11px;vertical-align:middle;}
+    body.saldos-ocultos .kpi-value, body.saldos-ocultos .calendar-month-kpi-value {filter:blur(8px);user-select:none;}
     .agenda-dashboard-layout.agenda-list-mode {display:block;}
     .agenda-dashboard-layout.agenda-list-mode .agenda-calendar-column {display:none;}
     .agenda-dashboard-layout.agenda-list-mode .upcoming-panel {display:none;}
@@ -698,12 +701,12 @@
           <div class="kpi-label" style="color: var(--destaque-semana);"><i class="fa-solid fa-star"></i> Esta Semana</div>
           <div class="kpi-value" style="color: var(--destaque-semana);" id="kpi-semana">0</div>
         </div>
-        <div class="kpi-card"><div class="kpi-label">Faturamento Total</div><div class="kpi-value gold" id="kpi-fat">R$ 0,00</div></div>
+        <div class="kpi-card"><div class="kpi-label">Faturamento Total <button type="button" class="privacy-toggle" onclick="alternarPrivacidadeSaldos()" aria-label="Ocultar saldos" title="Ocultar saldos"><i class="fa-solid fa-eye-slash"></i></button></div><div class="kpi-value gold" id="kpi-fat">R$ 0,00</div></div>
         <div class="kpi-card"><div class="kpi-label">Total a Receber</div><div class="kpi-value alert" id="kpi-receber">R$ 0,00</div></div>
         <div class="kpi-card"><div class="kpi-label">Eventos Concluídos</div><div class="kpi-value success" id="kpi-concluidos">0</div></div>
       </section>
 
-      <div class="filter-bar">
+      <div class="filter-bar" id="agenda-filter-bar">
         <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" style="min-width:180px;">
         <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()">
         <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
@@ -739,7 +742,7 @@
           </div>
         </div>
         <div class="calendar-month-kpis">
-          <div class="calendar-month-kpi recebido"><div class="calendar-month-kpi-label"><i class="fa-solid fa-circle-check"></i> Recebido no mês</div><div id="calendar-recebido" class="calendar-month-kpi-value">R$ 0,00</div></div>
+          <div class="calendar-month-kpi recebido"><div class="calendar-month-kpi-label"><i class="fa-solid fa-circle-check"></i> Recebido no mês <button type="button" class="privacy-toggle" onclick="alternarPrivacidadeSaldos()" aria-label="Ocultar saldos" title="Ocultar saldos"><i class="fa-solid fa-eye-slash"></i></button></div><div id="calendar-recebido" class="calendar-month-kpi-value">R$ 0,00</div></div>
           <div class="calendar-month-kpi aberto"><div class="calendar-month-kpi-label"><i class="fa-solid fa-hourglass-half"></i> Saldo em aberto no mês</div><div id="calendar-aberto" class="calendar-month-kpi-value">R$ 0,00</div></div>
         </div>
         <div class="calendar-legend">
@@ -1374,6 +1377,14 @@
       document.getElementById('filtro-mes').value = chaveMesCalendario(mesCalendario);
       render();
     }
+    function alternarPrivacidadeSaldos() {
+      const ocultos = document.body.classList.toggle("saldos-ocultos");
+      document.querySelectorAll(".privacy-toggle").forEach(btn => {
+        btn.innerHTML = ocultos ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>';
+        btn.setAttribute("aria-label", ocultos ? "Mostrar saldos" : "Ocultar saldos");
+        btn.title = ocultos ? "Mostrar saldos" : "Ocultar saldos";
+      });
+    }
     function alternarVisaoAgenda(visao) {
       visaoAgenda = visao === 'lista' ? 'lista' : 'calendario';
       const lista = document.getElementById('agenda-list-container');
@@ -1382,6 +1393,8 @@
       const dashboard = document.querySelector('.agenda-dashboard-layout');
       if (!lista || !calendario) return;
       if (dashboard) dashboard.classList.toggle('agenda-list-mode', visaoAgenda === 'lista');
+      const filtros = document.getElementById('agenda-filter-bar');
+      if (filtros) filtros.classList.toggle('calendar-list-hidden', visaoAgenda !== 'lista');
       lista.classList.toggle('calendar-list-hidden', visaoAgenda !== 'lista');
       if (cabecalho) cabecalho.classList.toggle('hidden', visaoAgenda !== 'lista');
       calendario.classList.toggle('hidden', visaoAgenda !== 'calendario');
