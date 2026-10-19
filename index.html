@@ -301,6 +301,63 @@
     }
 
     .table-wrapper { background: var(--grafite); border: 1px solid var(--gold-border-soft); border-radius: var(--radius-md); overflow-x: auto; }
+
+    /* ===================== CALENDÁRIO VISUAL ===================== */
+    .brand-title-logo { min-height: 44px; }
+    .brand-logo { display:block; width:190px; max-width:42vw; max-height:52px; object-fit:contain; object-position:left center; }
+    .brand-logo-fallback { color:var(--dourado); font-size:18px; align-items:center; }
+    .calendar-panel { background:var(--grafite); border:1px solid var(--gold-border-soft); border-radius:14px; padding:18px; margin:0 0 20px; box-shadow:0 10px 28px rgba(0,0,0,.16); }
+    .calendar-top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .calendar-month-controls { display:flex; align-items:center; gap:10px; }
+    .calendar-month-label { color:#fff; font-family:'Playfair Display',serif; font-size:22px; min-width:185px; text-align:center; }
+    .calendar-nav-btn { width:34px; height:34px; border:1px solid var(--gold-border-soft); border-radius:8px; background:var(--preto-2); color:var(--dourado); cursor:pointer; }
+    .calendar-nav-btn:hover { border-color:var(--dourado); background:var(--dourado-glow); }
+    .calendar-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .calendar-view-btn { border:1px solid var(--gold-border-soft); background:var(--preto-2); color:var(--cinza-suave); padding:9px 12px; border-radius:7px; cursor:pointer; font-size:10px; font-weight:700; letter-spacing:.7px; text-transform:uppercase; }
+    .calendar-view-btn.active { color:var(--dourado); border-color:var(--dourado); background:var(--dourado-glow); }
+    .calendar-month-kpis { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+    .calendar-month-kpi { border:1px solid var(--gold-border-soft); border-radius:10px; padding:13px 15px; background:linear-gradient(135deg,rgba(212,175,122,.07),rgba(255,255,255,.015)); }
+    .calendar-month-kpi.recebido { border-left:3px solid var(--sucesso); }
+    .calendar-month-kpi.aberto { border-left:3px solid var(--alerta); }
+    .calendar-month-kpi-label { color:var(--cinza-suave); text-transform:uppercase; font-size:9px; letter-spacing:1px; margin-bottom:5px; }
+    .calendar-month-kpi-value { color:#fff; font-size:21px; font-weight:700; }
+    .calendar-month-kpi.recebido .calendar-month-kpi-value { color:var(--sucesso); }
+    .calendar-month-kpi.aberto .calendar-month-kpi-value { color:var(--alerta); }
+    .calendar-legend { display:flex; flex-wrap:wrap; gap:12px; margin:0 0 12px; color:var(--cinza-suave); font-size:10px; }
+    .calendar-legend-item { display:inline-flex; align-items:center; gap:5px; }
+    .calendar-legend-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .calendar-scroll { overflow-x:auto; padding-bottom:2px; }
+    .calendar-weekdays, .calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); min-width:680px; }
+    .calendar-weekdays { border:1px solid var(--gold-border-soft); border-bottom:0; border-radius:9px 9px 0 0; overflow:hidden; }
+    .calendar-weekday { text-align:center; padding:10px 4px; background:var(--preto-2); color:var(--cinza-suave); font-size:9px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; }
+    .calendar-grid { border-left:1px solid var(--gold-border-soft); border-top:1px solid var(--gold-border-soft); }
+    .calendar-day { min-height:116px; padding:7px; border-right:1px solid var(--gold-border-soft); border-bottom:1px solid var(--gold-border-soft); background:rgba(255,255,255,.008); }
+    .calendar-day.other-month { background:rgba(0,0,0,.16); }
+    .calendar-day.today { background:rgba(56,189,248,.055); box-shadow:inset 0 0 0 1px rgba(56,189,248,.38); }
+    .calendar-day-number { color:var(--cinza-suave); font-size:10px; font-weight:700; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+    .calendar-day.today .calendar-day-number { color:#38BDF8; }
+    .calendar-event { display:block; width:100%; text-align:left; border:0; border-left:3px solid var(--dourado); background:rgba(212,175,122,.11); color:#f4e5ce; padding:5px 5px 5px 6px; border-radius:4px; margin-bottom:4px; cursor:pointer; overflow:hidden; }
+    .calendar-event:hover { filter:brightness(1.18); }
+    .calendar-event-time { display:block; font-size:9px; font-weight:700; opacity:.9; margin-bottom:2px; }
+    .calendar-event-name { display:block; font-size:10px; line-height:1.25; font-weight:600; overflow-wrap:anywhere; }
+    .calendar-event.status-quitado { border-left-color:#4EBA87; background:rgba(78,186,135,.12); color:#b8f1d5; }
+    .calendar-event.status-concluido { border-left-color:#4EBA87; background:rgba(78,186,135,.07); color:#b8f1d5; opacity:.78; }
+    .calendar-event.status-semana { border-left-color:#38BDF8; background:rgba(56,189,248,.12); color:#c7edff; }
+    .calendar-event.status-atrasado { border-left-color:#E05D5D; background:rgba(224,93,93,.12); color:#ffcaca; }
+    .calendar-more { color:var(--cinza-suave); font-size:9px; padding:2px 3px; }
+    .calendar-empty { padding:26px 14px; text-align:center; color:var(--cinza-suave); font-size:12px; }
+    .calendar-list-hidden { display:none !important; }
+    @media (max-width:640px) {
+      .header { padding:10px 14px; }
+      .brand-logo { width:155px; max-width:52vw; max-height:44px; }
+      .calendar-panel { padding:12px; }
+      .calendar-month-label { font-size:18px; min-width:150px; }
+      .calendar-month-kpi-value { font-size:17px; }
+      .calendar-month-kpi { padding:11px; }
+      .calendar-actions { width:100%; }
+      .calendar-view-btn { flex:1; }
+    }
+
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; min-width: 980px; }
     thead th { background: var(--preto-2); color: var(--cinza-suave); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; padding: 12px 10px; border-bottom: 1px solid var(--gold-border-soft); white-space: nowrap; }
     tbody td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--cinza-claro); vertical-align: middle; }
@@ -456,7 +513,7 @@
     <header class="header">
       <div class="header-container">
         <div>
-          <div class="brand-title"><i class="fa-solid fa-camera-retro"></i> ENTRE CLICKS</div>
+          <div class="brand-title brand-title-logo"><img class="brand-logo" src="https://scwznirvzwrphztvopbz.supabase.co/storage/v1/object/public/logos/logo-horizontal.png" alt="EntreClicks" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><span class="brand-logo-fallback" style="display:none;">ENTRE CLICKS</span></div>
           <div class="brand-subtitle">hub administrativo</div>
         </div>
 
@@ -493,7 +550,7 @@
 
       <div class="filter-bar">
         <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" style="min-width:180px;">
-        <input type="month" id="filtro-mes" oninput="render()">
+        <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()">
         <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
           <option value="">Todas as Datas</option>
           <option value="semana">⭐ Somente Esta Semana</option>
@@ -511,14 +568,46 @@
         </select>
       </div>
 
-      <div class="section-header">
+      <section class="calendar-panel" aria-label="Calendário mensal da agenda">
+        <div class="calendar-top">
+          <div class="calendar-month-controls">
+            <button type="button" class="calendar-nav-btn" onclick="navegarMesCalendario(-1)" aria-label="Mês anterior"><i class="fa-solid fa-chevron-left"></i></button>
+            <h2 id="calendar-month-label" class="calendar-month-label">Calendário</h2>
+            <button type="button" class="calendar-nav-btn" onclick="navegarMesCalendario(1)" aria-label="Próximo mês"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div class="calendar-actions">
+            <button type="button" class="calendar-view-btn active" id="btn-visao-calendario" onclick="alternarVisaoAgenda('calendario')"><i class="fa-regular fa-calendar"></i> Calendário</button>
+            <button type="button" class="calendar-view-btn" id="btn-visao-lista" onclick="alternarVisaoAgenda('lista')"><i class="fa-solid fa-list"></i> Lista completa</button>
+            <button type="button" class="calendar-view-btn" onclick="irParaMesAtual()"><i class="fa-solid fa-calendar-day"></i> Hoje</button>
+          </div>
+        </div>
+        <div class="calendar-month-kpis">
+          <div class="calendar-month-kpi recebido"><div class="calendar-month-kpi-label"><i class="fa-solid fa-circle-check"></i> Recebido no mês</div><div id="calendar-recebido" class="calendar-month-kpi-value">R$ 0,00</div></div>
+          <div class="calendar-month-kpi aberto"><div class="calendar-month-kpi-label"><i class="fa-solid fa-hourglass-half"></i> Saldo em aberto no mês</div><div id="calendar-aberto" class="calendar-month-kpi-value">R$ 0,00</div></div>
+        </div>
+        <div class="calendar-legend">
+          <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#D4AF7A"></i> Agendado</span>
+          <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#38BDF8"></i> Esta semana</span>
+          <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#4EBA87"></i> Quitado / concluído</span>
+          <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#E05D5D"></i> Saldo vencido</span>
+        </div>
+        <div class="calendar-scroll">
+          <div class="calendar-weekdays" aria-hidden="true">
+            <div class="calendar-weekday">Dom</div><div class="calendar-weekday">Seg</div><div class="calendar-weekday">Ter</div><div class="calendar-weekday">Qua</div><div class="calendar-weekday">Qui</div><div class="calendar-weekday">Sex</div><div class="calendar-weekday">Sáb</div>
+          </div>
+          <div id="calendar-grid" class="calendar-grid"></div>
+        </div>
+        <div id="calendar-empty" class="calendar-empty hidden">Nenhum evento neste mês com os filtros selecionados.</div>
+      </section>
+
+      <div class="section-header" id="agenda-list-heading">
         <div>
           <h2 class="section-title">Agenda Executiva</h2>
           <p class="section-subtitle">Clique no local para abrir o GPS</p>
         </div>
       </div>
 
-      <div class="table-wrapper">
+      <div id="agenda-list-container" class="table-wrapper calendar-list-hidden">
         <table>
           <thead>
             <tr>
@@ -1078,6 +1167,96 @@
       renderMimo();
     }
 
+
+    // Calendário mensal da agenda: os dados continuam vindo do mesmo array sincronizado.
+    let mesCalendario = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    let visaoAgenda = 'calendario';
+
+    function chaveMesCalendario(data) {
+      return data.getFullYear() + '-' + String(data.getMonth() + 1).padStart(2, '0');
+    }
+    function sincronizarMesCalendario(valor) {
+      if (valor && /^\d{4}-\d{2}$/.test(valor)) {
+        const [ano, mes] = valor.split('-').map(Number);
+        mesCalendario = new Date(ano, mes - 1, 1);
+      } else {
+        const hoje = new Date();
+        mesCalendario = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      }
+    }
+    function navegarMesCalendario(delta) {
+      mesCalendario = new Date(mesCalendario.getFullYear(), mesCalendario.getMonth() + delta, 1);
+      document.getElementById('filtro-mes').value = chaveMesCalendario(mesCalendario);
+      render();
+    }
+    function irParaMesAtual() {
+      const hoje = new Date();
+      mesCalendario = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      document.getElementById('filtro-mes').value = chaveMesCalendario(mesCalendario);
+      render();
+    }
+    function alternarVisaoAgenda(visao) {
+      visaoAgenda = visao === 'lista' ? 'lista' : 'calendario';
+      const lista = document.getElementById('agenda-list-container');
+      const cabecalho = document.getElementById('agenda-list-heading');
+      const calendario = document.querySelector('.calendar-panel');
+      if (!lista || !calendario) return;
+      lista.classList.toggle('calendar-list-hidden', visaoAgenda !== 'lista');
+      if (cabecalho) cabecalho.classList.toggle('hidden', visaoAgenda !== 'lista');
+      calendario.classList.toggle('hidden', visaoAgenda !== 'calendario');
+      document.getElementById('btn-visao-calendario').classList.toggle('active', visaoAgenda === 'calendario');
+      document.getElementById('btn-visao-lista').classList.toggle('active', visaoAgenda === 'lista');
+    }
+    function escaparTextoCalendario(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+    function renderCalendario(busca, periodo, statusF, contratoF) {
+      const grid = document.getElementById('calendar-grid');
+      if (!grid) return;
+      const ano = mesCalendario.getFullYear();
+      const mes = mesCalendario.getMonth();
+      const chave = chaveMesCalendario(mesCalendario);
+      document.getElementById('calendar-month-label').textContent = mesCalendario.toLocaleDateString('pt-BR', {month:'long',year:'numeric'}).replace(/^\w/, m => m.toUpperCase());
+
+      const doMes = eventos.filter(ev => {
+        if (!ev.data || !ev.data.startsWith(chave)) return false;
+        const st = getStatusReal(ev);
+        if (busca && !String(ev.cliente || '').toLowerCase().includes(busca)) return false;
+        if (periodo === 'semana' && !isNaSemanaAtual(ev.data)) return false;
+        if (statusF && st !== statusF) return false;
+        if (contratoF && ev.contrato !== contratoF) return false;
+        return true;
+      }).sort((a,b) => (a.data || '').localeCompare(b.data || '') || (a.inicio || '').localeCompare(b.inicio || ''));
+
+      const recebido = doMes.reduce((s, ev) => s + (Number(ev.pago) || 0), 0);
+      const aberto = doMes.reduce((s, ev) => s + getSaldoRestante(ev), 0);
+      document.getElementById('calendar-recebido').textContent = formatMoney(recebido);
+      document.getElementById('calendar-aberto').textContent = formatMoney(aberto);
+
+      const primeiroDia = new Date(ano, mes, 1);
+      const inicioGrade = new Date(ano, mes, 1 - primeiroDia.getDay());
+      const agora = new Date();
+      const hojeISO = agora.getFullYear() + '-' + String(agora.getMonth()+1).padStart(2,'0') + '-' + String(agora.getDate()).padStart(2,'0');
+      const diasGrade = [];
+      for (let i=0; i<42; i++) {
+        const dia = new Date(inicioGrade.getFullYear(), inicioGrade.getMonth(), inicioGrade.getDate()+i);
+        const iso = dia.getFullYear() + '-' + String(dia.getMonth()+1).padStart(2,'0') + '-' + String(dia.getDate()).padStart(2,'0');
+        const eventosDia = doMes.filter(ev => ev.data === iso);
+        const conteudo = eventosDia.slice(0,3).map(ev => {
+          const st = getStatusReal(ev);
+          const saldo = getSaldoRestante(ev);
+          const dias = diasParaEvento(ev);
+          const classe = st === 'concluido' ? 'status-concluido' : st === 'quitado' ? 'status-quitado' : (saldo > 0 && dias < 0) ? 'status-atrasado' : isNaSemanaAtual(ev.data) ? 'status-semana' : '';
+          return '<button type="button" class="calendar-event ' + classe + '" title="Abrir evento de ' + escaparTextoCalendario(ev.cliente) + '" onclick="editarEvento(' + Number(ev.id) + ')"><span class="calendar-event-time">' + escaparTextoCalendario(ev.inicio || '--:--') + (ev.termino ? '–' + escaparTextoCalendario(ev.termino) : '') + '</span><span class="calendar-event-name">' + escaparTextoCalendario(ev.cliente || 'Evento sem nome') + '</span></button>';
+        }).join('');
+        const mais = eventosDia.length > 3 ? '<div class="calendar-more">+' + (eventosDia.length - 3) + ' evento(s)</div>' : '';
+        diasGrade.push('<div class="calendar-day' + (dia.getMonth() !== mes ? ' other-month' : '') + (iso === hojeISO ? ' today' : '') + '"><div class="calendar-day-number"><span>' + dia.getDate() + '</span>' + (iso === hojeISO ? '<span>HOJE</span>' : '') + '</div>' + conteudo + mais + '</div>');
+      }
+      grid.innerHTML = diasGrade.join('');
+      document.getElementById('calendar-empty').classList.toggle('hidden', doMes.length > 0);
+      document.querySelector('.calendar-scroll').classList.toggle('hidden', doMes.length === 0);
+    }
+
     function render(){
       const tbody=document.getElementById('lista-eventos'); tbody.innerHTML='';
       const concluidosTbody=document.getElementById('lista-eventos-concluidos');
@@ -1175,6 +1354,8 @@
       document.getElementById('kpi-fat').innerText=formatMoney(fat);
       document.getElementById('kpi-receber').innerText=formatMoney(receber);
       document.getElementById('kpi-concluidos').innerText=concluidos;
+      renderCalendario(busca, periodo, statusF, contratoF);
+      alternarVisaoAgenda(visaoAgenda);
       localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
     }
 
