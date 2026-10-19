@@ -592,6 +592,39 @@
       .calendar-event-name {font-size:9px;}
     }
 
+
+    /* Layout fiel à referência enviada: indicadores no topo, calendário + próximos eventos */
+    .agenda-hero {margin:0 0 24px;padding:0 0 0 1px;}
+    .agenda-eyebrow {font-size:10px;letter-spacing:2px;font-weight:700;color:#e3b66f;margin-bottom:9px;}
+    .agenda-hero h1 {font-family:'Playfair Display',serif;font-size:30px;line-height:1.2;font-weight:600;color:#f4f1ed;letter-spacing:-.6px;margin:0 0 9px;}
+    .agenda-hero p {font-size:12px;color:#a4adbd;}
+    .agenda-dashboard-layout {display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start;margin-bottom:22px;}
+    .agenda-calendar-column {min-width:0;}
+    .agenda-dashboard-layout .calendar-panel {margin-bottom:0;}
+    .upcoming-panel {min-width:0;background:rgba(18,20,25,.96);border:1px solid #282c34;border-radius:15px;padding:19px 18px;min-height:260px;}
+    .upcoming-heading {padding-bottom:15px;border-bottom:1px solid #282c34;margin-bottom:4px;}
+    .upcoming-heading h2 {font-family:'DM Sans',sans-serif;font-size:16px;color:#f3f4f6;font-weight:700;margin-bottom:4px;}
+    .upcoming-heading p {font-size:10px;color:#969daa;}
+    .upcoming-day-label {font-size:10px;font-weight:700;color:#eab66b;text-transform:uppercase;margin:15px 0 8px;}
+    .upcoming-event {display:grid;grid-template-columns:42px 3px minmax(0,1fr);gap:10px;padding:11px 0;border-bottom:1px solid #292c33;align-items:stretch;cursor:pointer;}
+    .upcoming-event:last-child {border-bottom:0;}
+    .upcoming-time {font-size:10px;color:#b7c7e5;padding-top:2px;white-space:nowrap;}
+    .upcoming-event-bar {border-radius:5px;background:#b99af7;min-height:40px;}
+    .upcoming-event-bar.green {background:#57c8a5;}
+    .upcoming-event-bar.blue {background:#68b7f4;}
+    .upcoming-event-bar.gold {background:#d4af7a;}
+    .upcoming-event-bar.red {background:#e05d5d;}
+    .upcoming-event-name {font-size:11px;font-weight:700;color:#f3f4f6;line-height:1.4;overflow-wrap:anywhere;}
+    .upcoming-event-meta {font-size:10px;color:#a0a8b6;margin-top:4px;line-height:1.4;}
+    .upcoming-event-badge {display:inline-block;font-size:8px;font-weight:700;text-transform:uppercase;border-radius:4px;padding:3px 6px;margin-top:6px;background:rgba(185,154,247,.12);color:#c9b5ff;}
+    .upcoming-event-badge.green {background:rgba(87,200,165,.12);color:#57c8a5;}
+    .upcoming-event-badge.gold {background:rgba(212,175,122,.12);color:#e2bd83;}
+    .upcoming-event-badge.red {background:rgba(224,93,93,.12);color:#f39a9a;}
+    .upcoming-empty {padding:20px 0;color:#9299a6;font-size:11px;line-height:1.6;}
+    @media(max-width:1100px){.agenda-dashboard-layout{grid-template-columns:minmax(0,1fr) 270px;gap:12px;}.upcoming-panel{padding:15px 13px;}}
+    @media(max-width:900px){.agenda-dashboard-layout{grid-template-columns:1fr;}.upcoming-panel{min-height:0;}.agenda-dashboard-layout .calendar-panel{margin-bottom:0;}}
+    @media(max-width:640px){.agenda-hero h1{font-size:25px;}.agenda-hero{margin-bottom:18px;}.upcoming-panel{padding:14px;border-radius:12px;}}
+
   </style>
 </head>
 <body>
@@ -641,6 +674,11 @@
 
     <!-- APP GESTÃO -->
     <main id="app-gestao" class="main-container">
+      <section class="agenda-hero">
+        <div class="agenda-eyebrow">VISÃO GERAL · AGENDA</div>
+        <h1>Agenda de eventos</h1>
+        <p>Uma nova forma de visualizar seus eventos — mantendo o estilo elegante da EntreClicks.</p>
+      </section>
       <section class="kpi-grid">
         <div class="kpi-card" style="border-color: var(--destaque-semana-border);">
           <div class="kpi-label" style="color: var(--destaque-semana);"><i class="fa-solid fa-star"></i> Esta Semana</div>
@@ -671,6 +709,8 @@
         </select>
       </div>
 
+      <div class="agenda-dashboard-layout">
+      <div class="agenda-calendar-column">
       <section class="calendar-panel" aria-label="Calendário mensal da agenda">
         <div class="calendar-top">
           <div class="calendar-month-controls">
@@ -702,6 +742,12 @@
         </div>
         <div id="calendar-empty" class="calendar-empty hidden">Nenhum evento neste mês com os filtros selecionados.</div>
       </section>
+      </div>
+      <aside class="upcoming-panel" aria-label="Próximos eventos">
+        <div class="upcoming-heading"><h2>Próximos eventos</h2><p>Sua agenda em um relance</p></div>
+        <div id="upcoming-events-list" class="upcoming-events-list"><div class="upcoming-empty">Carregando agenda...</div></div>
+      </aside>
+      </div>
 
       <div class="section-header" id="agenda-list-heading">
         <div>
@@ -1313,6 +1359,43 @@
     function escaparTextoCalendario(valor) {
       return String(valor ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
+
+    function renderProximosEventos() {
+      const box = document.getElementById('upcoming-events-list');
+      if (!box) return;
+      const hoje = new Date();
+      hoje.setHours(0,0,0,0);
+      const futuros = [...eventos].filter(ev => {
+        if (!ev.data || getStatusReal(ev) === 'concluido') return false;
+        const partes = ev.data.split('-').map(Number);
+        const dataEv = new Date(partes[0], partes[1]-1, partes[2]);
+        return dataEv >= hoje;
+      }).sort((a,b) => (a.data || '').localeCompare(b.data || '') || (a.inicio || '').localeCompare(b.inicio || '')).slice(0,6);
+      if (!futuros.length) {
+        box.innerHTML = '<div class="upcoming-empty">Nenhum próximo evento cadastrado.<br>Seus novos compromissos aparecerão aqui automaticamente.</div>';
+        return;
+      }
+      const hojeISO = hoje.getFullYear()+'-'+String(hoje.getMonth()+1).padStart(2,'0')+'-'+String(hoje.getDate()).padStart(2,'0');
+      let diaAtual = '';
+      box.innerHTML = futuros.map(ev => {
+        const st = getStatusReal(ev);
+        const saldo = getSaldoRestante(ev);
+        const d = ev.data.split('-').map(Number);
+        const date = new Date(d[0],d[1]-1,d[2]);
+        const iso = ev.data;
+        const dia = iso === hojeISO ? 'HOJE · ' + date.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','') : date.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'short'}).replace('.','');
+        const horario = ev.inicio || '--:--';
+        const local = escaparTextoCalendario(ev.local || 'Local não informado');
+        const nome = escaparTextoCalendario(ev.cliente || 'Evento sem nome');
+        const cor = st === 'quitado' ? 'green' : (saldo > 0 && diasParaEvento(ev) < 0 ? 'red' : (isNaSemanaAtual(ev.data) ? 'blue' : ''));
+        const statusLabel = st === 'quitado' ? 'QUITADO' : (saldo > 0 ? 'SALDO PENDENTE' : 'AGENDADO');
+        const badge = st === 'quitado' ? 'green' : (saldo > 0 ? 'gold' : '');
+        const label = dia !== diaAtual ? '<div class="upcoming-day-label">'+dia+'</div>' : '';
+        diaAtual = dia;
+        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\'Enter\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
+      }).join('');
+    }
+
     function renderCalendario(busca, periodo, statusF, contratoF) {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
@@ -1457,6 +1540,7 @@
       document.getElementById('kpi-receber').innerText=formatMoney(receber);
       document.getElementById('kpi-concluidos').innerText=concluidos;
       renderCalendario(busca, periodo, statusF, contratoF);
+      renderProximosEventos();
       alternarVisaoAgenda(visaoAgenda);
       localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
     }
