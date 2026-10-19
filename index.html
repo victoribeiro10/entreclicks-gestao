@@ -634,6 +634,12 @@
     #ev-tipo-evento {width:100%;background:var(--grafite-input);border:1px solid var(--gold-border-soft);color:#fff;padding:10px 12px;border-radius:var(--radius-sm);font-size:12px;outline:none;}
     #ev-tipo-evento:focus {border-color:var(--dourado);}
 
+
+    /* Na lista completa, recolhe a coluna lateral para a tabela usar toda a largura. */
+    .agenda-dashboard-layout.agenda-list-mode {display:block;}
+    .agenda-dashboard-layout.agenda-list-mode .agenda-calendar-column {display:none;}
+    .agenda-dashboard-layout.agenda-list-mode .upcoming-panel {display:none;}
+
   </style>
 </head>
 <body>
@@ -1373,7 +1379,9 @@
       const lista = document.getElementById('agenda-list-container');
       const cabecalho = document.getElementById('agenda-list-heading');
       const calendario = document.querySelector('.calendar-panel');
+      const dashboard = document.querySelector('.agenda-dashboard-layout');
       if (!lista || !calendario) return;
+      if (dashboard) dashboard.classList.toggle('agenda-list-mode', visaoAgenda === 'lista');
       lista.classList.toggle('calendar-list-hidden', visaoAgenda !== 'lista');
       if (cabecalho) cabecalho.classList.toggle('hidden', visaoAgenda !== 'lista');
       calendario.classList.toggle('hidden', visaoAgenda !== 'calendario');
