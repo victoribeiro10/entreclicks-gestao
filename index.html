@@ -1415,7 +1415,7 @@
     }
 
     function classeTipoEvento(ev) {
-      const tipo = String((ev && ev.tipoEvento) || "outro").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim().replace(/\\s+/g,"-");
+      const tipo = String((ev && ev.tipoEvento) || "outro").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g,"-");
       return ["aniversario","casamento","corporativo","15-anos","infantil","batizado"].includes(tipo) ? tipo : "outro";
     }
     function nomeTipoEvento(ev) {
