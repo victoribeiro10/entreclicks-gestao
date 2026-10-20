@@ -344,6 +344,8 @@
     .calendar-event.status-concluido { border-left-color:#4EBA87; background:rgba(78,186,135,.07); color:#b8f1d5; opacity:.78; }
     .calendar-event.status-semana { border-left-color:#38BDF8; background:rgba(56,189,248,.12); color:#c7edff; }
     .calendar-event.status-atrasado { border-left-color:#E05D5D; background:rgba(224,93,93,.12); color:#ffcaca; }
+    .calendar-event.tipo-aniversario {border-left-color:#B99AF7;background:rgba(185,154,247,.15);color:#e0d3ff;}.calendar-event.tipo-casamento {border-left-color:#F08BA8;background:rgba(240,139,168,.14);color:#ffd5e0;}.calendar-event.tipo-corporativo {border-left-color:#68B7F4;background:rgba(104,183,244,.14);color:#d1ecff;}.calendar-event.tipo-15-anos {border-left-color:#C084FC;background:rgba(192,132,252,.14);color:#edd7ff;}.calendar-event.tipo-infantil {border-left-color:#F4A261;background:rgba(244,162,97,.14);color:#ffe0c2;}.calendar-event.tipo-batizado {border-left-color:#55C7B4;background:rgba(85,199,180,.14);color:#c8fff4;}.calendar-event.tipo-outro {border-left-color:#D4AF7A;background:rgba(212,175,122,.11);color:#f4e5ce;}
+    .calendar-event.tipo-aniversario.status-concluido,.calendar-event.tipo-casamento.status-concluido,.calendar-event.tipo-corporativo.status-concluido,.calendar-event.tipo-15-anos.status-concluido,.calendar-event.tipo-infantil.status-concluido,.calendar-event.tipo-batizado.status-concluido,.calendar-event.tipo-outro.status-concluido {opacity:.72;}
     .calendar-more { color:var(--cinza-suave); font-size:9px; padding:2px 3px; }
     .calendar-empty { padding:26px 14px; text-align:center; color:var(--cinza-suave); font-size:12px; }
     .calendar-list-hidden { display:none !important; }
@@ -614,6 +616,10 @@
     .upcoming-event-bar.blue {background:#68b7f4;}
     .upcoming-event-bar.gold {background:#d4af7a;}
     .upcoming-event-bar.red {background:#e05d5d;}
+    .upcoming-event-bar.tipo-aniversario {background:#B99AF7;}.upcoming-event-bar.tipo-casamento {background:#F08BA8;}.upcoming-event-bar.tipo-corporativo {background:#68B7F4;}.upcoming-event-bar.tipo-15-anos {background:#C084FC;}.upcoming-event-bar.tipo-infantil {background:#F4A261;}.upcoming-event-bar.tipo-batizado {background:#55C7B4;}.upcoming-event-bar.tipo-outro {background:#D4AF7A;}
+    .tipo-evento-tag {display:inline-flex;align-items:center;gap:4px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;border-radius:4px;padding:3px 6px;margin:3px 4px 0 0;border:1px solid currentColor;}
+    .tipo-evento-tag.tipo-aniversario {color:#c9b5ff;background:rgba(185,154,247,.1);}.tipo-evento-tag.tipo-casamento {color:#ffb6ca;background:rgba(240,139,168,.1);}.tipo-evento-tag.tipo-corporativo {color:#9bd6ff;background:rgba(104,183,244,.1);}.tipo-evento-tag.tipo-15-anos {color:#ddb5ff;background:rgba(192,132,252,.1);}.tipo-evento-tag.tipo-infantil {color:#ffc28e;background:rgba(244,162,97,.1);}.tipo-evento-tag.tipo-batizado {color:#9cf0e2;background:rgba(85,199,180,.1);}.tipo-evento-tag.tipo-outro {color:#e2bd83;background:rgba(212,175,122,.1);}
+    .tipo-lista-dot {display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 6px 1px 0;vertical-align:middle;background:#D4AF7A;}.tipo-lista-dot.tipo-aniversario {background:#B99AF7}.tipo-lista-dot.tipo-casamento {background:#F08BA8}.tipo-lista-dot.tipo-corporativo {background:#68B7F4}.tipo-lista-dot.tipo-15-anos {background:#C084FC}.tipo-lista-dot.tipo-infantil {background:#F4A261}.tipo-lista-dot.tipo-batizado {background:#55C7B4}.tipo-lista-dot.tipo-outro {background:#D4AF7A;}
     .upcoming-event-name {font-size:11px;font-weight:700;color:#f3f4f6;line-height:1.4;overflow-wrap:anywhere;}
     .upcoming-event-meta {font-size:10px;color:#a0a8b6;margin-top:4px;line-height:1.4;}
     .upcoming-event-badge {display:inline-block;font-size:8px;font-weight:700;text-transform:uppercase;border-radius:4px;padding:3px 6px;margin-top:6px;background:rgba(185,154,247,.12);color:#c9b5ff;}
@@ -750,6 +756,7 @@
           <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#38BDF8"></i> Esta semana</span>
           <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#4EBA87"></i> Quitado / concluído</span>
           <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#E05D5D"></i> Saldo vencido</span>
+          <span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#B99AF7"></i> Aniversário</span><span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#F08BA8"></i> Casamento</span><span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#68B7F4"></i> Corporativo</span><span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#C084FC"></i> 15 anos</span><span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#F4A261"></i> Infantil</span><span class="calendar-legend-item"><i class="calendar-legend-dot" style="background:#55C7B4"></i> Batizado</span>
         </div>
         <div class="calendar-scroll">
           <div class="calendar-weekdays" aria-hidden="true">
@@ -1407,6 +1414,14 @@
       return String(valor ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
 
+    function classeTipoEvento(ev) {
+      const tipo = String((ev && ev.tipoEvento) || "outro").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim().replace(/\\s+/g,"-");
+      return ["aniversario","casamento","corporativo","15-anos","infantil","batizado"].includes(tipo) ? tipo : "outro";
+    }
+    function nomeTipoEvento(ev) {
+      const tipo = classeTipoEvento(ev);
+      return ({aniversario:"Aniversário",casamento:"Casamento",corporativo:"Corporativo","15-anos":"15 anos",infantil:"Infantil",batizado:"Batizado",outro:"Outro"})[tipo];
+    }
     function renderProximosEventos() {
       const box = document.getElementById('upcoming-events-list');
       if (!box) return;
@@ -1434,12 +1449,13 @@
         const horario = ev.inicio || '--:--';
         const local = escaparTextoCalendario(ev.local || 'Local não informado');
         const nome = escaparTextoCalendario(ev.cliente || 'Evento sem nome');
-        const cor = st === 'quitado' ? 'green' : (saldo > 0 && diasParaEvento(ev) < 0 ? 'red' : (isNaSemanaAtual(ev.data) ? 'blue' : ''));
+        const cor = 'tipo-' + classeTipoEvento(ev);
+        const tipoLabel = escaparTextoCalendario(nomeTipoEvento(ev));
         const statusLabel = st === 'quitado' ? 'QUITADO' : (saldo > 0 ? 'SALDO PENDENTE' : 'AGENDADO');
         const badge = st === 'quitado' ? 'green' : (saldo > 0 ? 'gold' : '');
         const label = dia !== diaAtual ? '<div class="upcoming-day-label">'+dia+'</div>' : '';
         diaAtual = dia;
-        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\'Enter\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
+        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\'Enter\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="tipo-evento-tag '+cor+'">'+tipoLabel+'</span><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
       }).join('');
     }
 
@@ -1480,7 +1496,8 @@
           const saldo = getSaldoRestante(ev);
           const dias = diasParaEvento(ev);
           const classe = st === 'concluido' ? 'status-concluido' : st === 'quitado' ? 'status-quitado' : (saldo > 0 && dias < 0) ? 'status-atrasado' : isNaSemanaAtual(ev.data) ? 'status-semana' : '';
-          return '<button type="button" class="calendar-event ' + classe + '" title="Abrir evento de ' + escaparTextoCalendario(ev.cliente) + '" onclick="editarEvento(' + Number(ev.id) + ')"><span class="calendar-event-time">' + escaparTextoCalendario(ev.inicio || '--:--') + (ev.termino ? '–' + escaparTextoCalendario(ev.termino) : '') + '</span><span class="calendar-event-name">' + escaparTextoCalendario(ev.cliente || 'Evento sem nome') + '</span></button>';
+          const tipoClasse = 'tipo-' + classeTipoEvento(ev);
+          return '<button type="button" class="calendar-event ' + tipoClasse + ' ' + classe + '" title="Abrir evento de ' + escaparTextoCalendario(ev.cliente) + '" onclick="editarEvento(' + Number(ev.id) + ')"><span class="calendar-event-time">' + escaparTextoCalendario(ev.inicio || '--:--') + (ev.termino ? '–' + escaparTextoCalendario(ev.termino) : '') + '</span><span class="calendar-event-name">' + escaparTextoCalendario(ev.cliente || 'Evento sem nome') + '</span></button>';
         }).join('');
         const mais = eventosDia.length > 3 ? '<div class="calendar-more">+' + (eventosDia.length - 3) + ' evento(s)</div>' : '';
         diasGrade.push('<div class="calendar-day' + (dia.getMonth() !== mes ? ' other-month' : '') + (iso === hojeISO ? ' today' : '') + '"><div class="calendar-day-number"><span>' + dia.getDate() + '</span>' + (iso === hojeISO ? '<span>HOJE</span>' : '') + '</div>' + conteudo + mais + '</div>');
@@ -1542,14 +1559,16 @@
         const rowClass = st==='concluido' ? 'evento-concluido' : (naSemana ? 'evento-destaque-semana' : '');
         const urlMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.local)}`;
 
+        const tipoClasse = 'tipo-' + classeTipoEvento(ev);
+        const tipoLabel = escaparTextoCalendario(nomeTipoEvento(ev));
         const tr=document.createElement('tr');
-        tr.className=rowClass;
+        tr.className=rowClass + ' ' + tipoClasse;
         tr.innerHTML=`
           <td style="font-weight:600;color:var(--dourado);white-space:nowrap;">
             <div>${dataFmt}</div><div class="evento-horario">${ev.inicio} - ${ev.termino}</div>
             ${hoje?`<span class="badge-hoje"><i class="fa-solid fa-bolt"></i> HOJE</span>`:(naSemana&&st!=='concluido'?`<span class="badge-semana"><i class="fa-solid fa-star"></i> SEMANA</span>`:'')}
           </td>
-          <td><div class="cliente-nome">${ev.cliente}</div><div class="cliente-tel">${formatarTelefone(ev.telefone)}</div></td>
+          <td><div class="cliente-nome"><span class="tipo-lista-dot ${tipoClasse}" aria-hidden="true"></span>${ev.cliente}</div><div class="cliente-tel">${formatarTelefone(ev.telefone)}</div><span class="tipo-evento-tag ${tipoClasse}">${tipoLabel}</span></td>
           <td><a class="local-link" href="${urlMaps}" target="_blank"><i class="fa-solid fa-location-dot local-icon"></i><span class="evento-local">${ev.local}</span></a></td>
           <td><div style="font-weight:500;">${formatMoney(ev.valor)}</div>${badges?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">${badges}</div>`:''}${ev.deslocamento>0?`<div style="font-size:9px;color:var(--alerta);">Deslocamento: +${formatMoney(ev.deslocamento)}</div>`:''}</td>
           <td><div class="valor-total">${formatMoney(total)}</div><div class="pagamento-cell"><span class="pago-info">Pago: ${formatMoney(ev.pago||0)}</span>${saldo>0?`<span class="saldo-restante ${alerta?'alerta-cobranca':''}">Resta: ${formatMoney(saldo)}</span>`:`<span style="font-size:9px;color:var(--sucesso);font-weight:600;">✓ Quitado</span>`}</div></td>
