@@ -344,8 +344,8 @@
     .calendar-event.status-concluido { border-left-color:#4EBA87; background:rgba(78,186,135,.07); color:#b8f1d5; opacity:.78; }
     .calendar-event.status-semana { border-left-color:#38BDF8; background:rgba(56,189,248,.12); color:#c7edff; }
     .calendar-event.status-atrasado { border-left-color:#E05D5D; background:rgba(224,93,93,.12); color:#ffcaca; }
-    .calendar-event.tipo-aniversario {border-left-color:#B99AF7;background:rgba(185,154,247,.15);color:#e0d3ff;}.calendar-event.tipo-casamento {border-left-color:#F08BA8;background:rgba(240,139,168,.14);color:#ffd5e0;}.calendar-event.tipo-corporativo {border-left-color:#68B7F4;background:rgba(104,183,244,.14);color:#d1ecff;}.calendar-event.tipo-15-anos {border-left-color:#C084FC;background:rgba(192,132,252,.14);color:#edd7ff;}.calendar-event.tipo-infantil {border-left-color:#F4A261;background:rgba(244,162,97,.14);color:#ffe0c2;}.calendar-event.tipo-batizado {border-left-color:#55C7B4;background:rgba(85,199,180,.14);color:#c8fff4;}.calendar-event.tipo-outro {border-left-color:#D4AF7A;background:rgba(212,175,122,.11);color:#f4e5ce;}
-    .calendar-event.tipo-aniversario.status-concluido,.calendar-event.tipo-casamento.status-concluido,.calendar-event.tipo-corporativo.status-concluido,.calendar-event.tipo-15-anos.status-concluido,.calendar-event.tipo-infantil.status-concluido,.calendar-event.tipo-batizado.status-concluido,.calendar-event.tipo-outro.status-concluido {opacity:.72;}
+    .calendar-event.tipo-aniversario {border-left-color:#B99AF7;background:rgba(185,154,247,.15);color:#e0d3ff;}.calendar-event.tipo-casamento {border-left-color:#F08BA8;background:rgba(240,139,168,.14);color:#ffd5e0;}.calendar-event.tipo-corporativo {border-left-color:#68B7F4;background:rgba(104,183,244,.14);color:#d1ecff;}.calendar-event.tipo-outro {border-left-color:#D4AF7A;background:rgba(212,175,122,.11);color:#f4e5ce;}
+    .calendar-event.tipo-aniversario.status-concluido,.calendar-event.tipo-casamento.status-concluido,.calendar-event.tipo-corporativo.status-concluido,.calendar-event.tipo-outro.status-concluido {opacity:.72;}
     .calendar-more { color:var(--cinza-suave); font-size:9px; padding:2px 3px; }
     .calendar-empty { padding:26px 14px; text-align:center; color:var(--cinza-suave); font-size:12px; }
     .calendar-list-hidden { display:none !important; }
@@ -865,10 +865,7 @@
               <option value="aniversario">Aniversário</option>
               <option value="casamento">Casamento</option>
               <option value="corporativo">Corporativo</option>
-              <option value="15 anos">15 anos</option>
-              <option value="infantil">Infantil</option>
-              <option value="batizado">Batizado</option>
-              <option value="outro">Outro</option>
+              <option value="outro">Outros</option>
             </select>
           </div>
           <div class="form-group"><label>Data do Evento</label><input type="date" id="ev-data" required></div>
@@ -1416,11 +1413,11 @@
 
     function classeTipoEvento(ev) {
       const tipo = String((ev && ev.tipoEvento) || "outro").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g,"-");
-      return ["aniversario","casamento","corporativo","15-anos","infantil","batizado"].includes(tipo) ? tipo : "outro";
+      return ["aniversario","casamento","corporativo"].includes(tipo) ? tipo : "outro";
     }
     function nomeTipoEvento(ev) {
       const tipo = classeTipoEvento(ev);
-      return ({aniversario:"Aniversário",casamento:"Casamento",corporativo:"Corporativo","15-anos":"15 anos",infantil:"Infantil",batizado:"Batizado",outro:"Outro"})[tipo];
+      return ({aniversario:"Aniversário",casamento:"Casamento",corporativo:"Corporativo",outro:"Outros"})[tipo];
     }
     function renderProximosEventos() {
       const box = document.getElementById('upcoming-events-list');
@@ -1671,7 +1668,7 @@
       document.getElementById('ev-id').value=ev.id;
       document.getElementById('ev-cliente').value=ev.cliente;
       document.getElementById('ev-telefone').value=formatarTelefone(ev.telefone);
-      document.getElementById('ev-tipo-evento').value=ev.tipoEvento||'outro';
+      document.getElementById('ev-tipo-evento').value=['aniversario','casamento','corporativo','outro'].includes(String(ev.tipoEvento||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()) ? String(ev.tipoEvento).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim() : 'outro';
       document.getElementById('ev-data').value=ev.data;
       document.getElementById('ev-local').value=ev.local;
       document.getElementById('ev-inicio').value=ev.inicio;
