@@ -1034,7 +1034,18 @@
 
 
     function mensagensDataISO(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-    function mensagensDataBR(iso) { if(!iso)return 'Data a confirmar'; const p=iso.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:iso; }
+    function mensagensDataISOValor(valor) {
+      if (!valor) return '';
+      const s = String(valor).trim();
+      const iso = s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);
+      if (iso) return iso[1]+'-'+iso[2]+'-'+iso[3];
+      const br = s.match(/^(\\d{2})[\\/.-](\\d{2})[\\/.-](\\d{4})$/);
+      if (br) return br[3]+'-'+br[2]+'-'+br[1];
+      const d = new Date(s);
+      if (!Number.isNaN(d.getTime())) return mensagensDataISO(d);
+      return '';
+    }
+    function mensagensDataBR(iso) { const normalizada=mensagensDataISOValor(iso); if(!normalizada)return 'Data a confirmar'; const p=normalizada.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
     function mensagensEscapar(v) { return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     function mensagensTexto(ev) {
       const nome=(ev.cliente||'').trim().split(/\s+/)[0]||'tudo bem';
@@ -1047,7 +1058,7 @@
       const domingo=new Date(segunda); domingo.setDate(segunda.getDate()+6);
       const ini=mensagensDataISO(segunda), fim=mensagensDataISO(domingo);
       document.getElementById('mensagens-periodo').textContent=mensagensDataBR(ini)+' até '+mensagensDataBR(fim)+' · segunda a domingo';
-      const lista=[...eventos].filter(e=>e.data>=ini&&e.data<=fim&&e.status!=='concluido').sort((a,b)=>(a.data||'').localeCompare(b.data||'')||(a.inicio||'').localeCompare(b.inicio||''));
+      const lista=[...eventos].map(e=>({...e,_mensagensDataISO:mensagensDataISOValor(e.data)})).filter(e=>e._mensagensDataISO>=ini&&e._mensagensDataISO<=fim&&e.status!=='concluido').sort((a,b)=>a._mensagensDataISO.localeCompare(b._mensagensDataISO)||(a.inicio||'').localeCompare(b.inicio||''));
       document.getElementById('mensagens-total').textContent=lista.length;
       document.getElementById('mensagens-prontas').textContent=lista.filter(e=>(e.telefone||'').trim()).length;
       if(!lista.length){box.innerHTML='<div class="mensagem-empty"><i class="fa-regular fa-calendar-xmark" style="font-size:22px;display:block;margin-bottom:10px;color:var(--dourado)"></i><strong>Nenhum evento nesta semana</strong><p style="margin-top:7px">Os eventos de segunda a domingo aparecerão aqui para revisão.</p></div>';return;}
