@@ -1306,8 +1306,10 @@
       const busca = (document.getElementById('mimo-filtro-busca')?.value || '').toLowerCase().trim();
       const filtroStatus = document.getElementById('mimo-filtro-status')?.value || '';
       const concluidos = eventos.filter(ev => getStatusReal(ev) === 'concluido' && contratosPorEvento[String(ev.id)]);
-      let aguardando = 0, parcial = 0, impressao = 0, entregue = 0, mostrados = 0;
-      concluidos.forEach(ev => {
+      const mimosEntregues = concluidos.filter(ev => getStatusMimo(ev, getQtdMimo(ev)) === 'entregue');
+      const listaMimos = abaMimoAtual === 'concluidos' ? mimosEntregues : concluidos.filter(ev => getStatusMimo(ev, getQtdMimo(ev)) !== 'entregue');
+      let aguardando = 0, parcial = 0, impressao = 0, mostrados = 0;
+      listaMimos.forEach(ev => {
         if (busca && !String(ev.cliente || '').toLowerCase().includes(busca)) return;
         const esperado = getQtdMimo(ev);
         const status = getStatusMimo(ev, esperado);
