@@ -1328,7 +1328,7 @@
         tr.innerHTML =
           '<td><div class="cliente-nome">' + (ev.cliente || 'Sem nome') + '</div><div class="evento-horario">' + dataFmt + ' · ' + (ev.local || '') + '</div></td>' +
           '<td><strong>' + (pacote || 'Não identificado') + '</strong><div class="evento-horario">' + direito + '</div>' +
-          (esperado ? '' : '<button class="btn-outline" style="margin-top:6px;padding:5px 8px;" onclick="switchApp('contratos')">Abrir contratos</button>') + '</td>' +
+           (esperado ? '' : '<button class="btn-outline" style="margin-top:6px;padding:5px 8px;" onclick="switchApp(&quot;contratos&quot;)">Abrir contratos</button>') + '</td>' +
           '<td style="min-width:145px;"><div style="display:flex;align-items:center;gap:6px;"><input id="mimo-qtd-' + ev.id + '" type="number" min="0" max="' + esperado + '" value="' + qtd + '" style="width:76px;" ' + (!esperado ? 'disabled' : '') + '><span class="evento-horario">/ ' + (esperado || '—') + '</span></div></td>' +
           '<td style="min-width:175px;"><select id="mimo-status-' + ev.id + '" ' + (!esperado ? 'disabled' : '') + '>' + statusOptions + '</select></td>' +
           '<td><input id="mimo-obs-' + ev.id + '" type="text" value="' + String(ev.mimoObservacao || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') + '" placeholder="Observação (opcional)" style="min-width:150px;" ' + (!esperado ? 'disabled' : '') + '></td>' +
