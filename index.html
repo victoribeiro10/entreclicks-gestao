@@ -846,7 +846,7 @@
       <section class="mensagens-hero"><div class="mensagens-eyebrow">RELACIONAMENTO · PRÉ-EVENTO</div><h1>Mensagens da Semana</h1><p>Confira os clientes com eventos entre segunda e domingo e visualize a mensagem de confirmação preparada para cada um.</p></section>
       <div class="mensagens-notice"><i class="fa-solid fa-shield-halved"></i><div><strong>Modo de prévia ativado.</strong> Nenhuma mensagem será enviada automaticamente nesta versão. Confira e copie os textos enquanto estruturamos a conexão oficial com o WhatsApp Business.</div></div>
       <section class="mensagens-summary"><div class="mensagem-stat"><span>Eventos nesta semana</span><strong id="mensagens-total">0</strong></div><div class="mensagem-stat"><span>Mensagens prontas para revisar</span><strong id="mensagens-prontas">0</strong></div><div class="mensagem-stat"><span>Envios realizados</span><strong>—</strong></div></section>
-      <div class="mensagens-toolbar"><div><h2>Agenda de mensagens</h2><div id="mensagens-periodo" class="mensagens-range">Calculando semana...</div></div><button class="btn-outline" onclick="renderMensagensSemana()"><i class="fa-solid fa-rotate"></i> Atualizar prévia</button></div>
+      <div class="mensagens-toolbar"><div><h2>Agenda de mensagens</h2><div id="mensagens-periodo" class="mensagens-range">Escolha o período para visualizar</div></div><div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap"><div class="form-group" style="margin:0"><label for="mensagens-data-inicio">De</label><input type="date" id="mensagens-data-inicio" value="2026-11-02" style="min-width:150px"></div><div class="form-group" style="margin:0"><label for="mensagens-data-fim">Até</label><input type="date" id="mensagens-data-fim" value="2026-11-07" style="min-width:150px"></div><button class="btn-outline" onclick="renderMensagensSemana()"><i class="fa-solid fa-rotate"></i> Aplicar período</button></div></div>
       <div id="mensagens-lista" class="mensagens-list"></div>
     </main>
 
@@ -1053,11 +1053,15 @@
     }
     function renderMensagensSemana() {
       const box=document.getElementById('mensagens-lista'); if(!box)return;
+      const inicioInput=document.getElementById('mensagens-data-inicio'), fimInput=document.getElementById('mensagens-data-fim');
       const hoje=new Date(); hoje.setHours(0,0,0,0);
       const segunda=new Date(hoje); segunda.setDate(hoje.getDate()-((hoje.getDay()+6)%7));
       const domingo=new Date(segunda); domingo.setDate(segunda.getDate()+6);
-      const ini=mensagensDataISO(segunda), fim=mensagensDataISO(domingo);
-      document.getElementById('mensagens-periodo').textContent=mensagensDataBR(ini)+' até '+mensagensDataBR(fim)+' · segunda a domingo';
+      if(inicioInput&&!inicioInput.value) inicioInput.value=mensagensDataISO(segunda);
+      if(fimInput&&!fimInput.value) fimInput.value=mensagensDataISO(domingo);
+      const ini=mensagensDataISOValor(inicioInput?inicioInput.value:mensagensDataISO(segunda)), fim=mensagensDataISOValor(fimInput?fimInput.value:mensagensDataISO(domingo));
+      if(!ini||!fim||ini>fim){document.getElementById('mensagens-periodo').textContent='Confira as datas selecionadas.';box.innerHTML='<div class="mensagem-empty"><strong>Período inválido</strong><p>Escolha uma data inicial igual ou anterior à data final.</p></div>';return;}
+      document.getElementById('mensagens-periodo').textContent=mensagensDataBR(ini)+' até '+mensagensDataBR(fim)+' · período selecionado';
       const lista=[...eventos].map(e=>({...e,_mensagensDataISO:mensagensDataISOValor(e.data)})).filter(e=>e._mensagensDataISO>=ini&&e._mensagensDataISO<=fim&&e.status!=='concluido').sort((a,b)=>a._mensagensDataISO.localeCompare(b._mensagensDataISO)||(a.inicio||'').localeCompare(b.inicio||''));
       document.getElementById('mensagens-total').textContent=lista.length;
       document.getElementById('mensagens-prontas').textContent=lista.filter(e=>(e.telefone||'').trim()).length;
