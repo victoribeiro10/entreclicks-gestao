@@ -1462,7 +1462,7 @@
         const badge = st === 'quitado' ? 'green' : (saldo > 0 ? 'gold' : '');
         const label = dia !== diaAtual ? '<div class="upcoming-day-label">'+dia+'</div>' : '';
         diaAtual = dia;
-        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key==='Enter')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="tipo-evento-tag '+cor+'">'+tipoLabel+'</span><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
+        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\\'Enter\\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="tipo-evento-tag '+cor+'">'+tipoLabel+'</span><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
       }).join('');
     }
 
