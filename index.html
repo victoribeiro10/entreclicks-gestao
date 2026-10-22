@@ -1318,7 +1318,6 @@
         if (status === 'aguardando_escolha') aguardando++;
         if (status === 'escolha_parcial') parcial++;
         if (status === 'impressao_pendente') impressao++;
-        if (status === 'entregue') entregue++;
         const dataFmt = String(ev.data || '').split('-').reverse().join('/');
         const qtd = Number(ev.mimoQtdRecebida) || 0;
         const pacote = getNomePacoteMimo(ev);
