@@ -449,7 +449,11 @@
       .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    .mimo-tabs { display:flex; gap:8px; margin:8px 0 14px; border-bottom:1px solid var(--gold-border); }\n    .mimo-tab { display:flex; align-items:center; gap:8px; padding:10px 14px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--cinza-suave); font:inherit; cursor:pointer; }\n    .mimo-tab.active { color:var(--dourado); border-bottom-color:var(--dourado); font-weight:700; }\n    .mimo-tab span { padding:2px 7px; border-radius:12px; background:rgba(212,175,122,.12); font-size:11px; }\n    /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
+    .mimo-tabs { display:flex; gap:8px; margin:8px 0 14px; border-bottom:1px solid var(--gold-border); }
+    .mimo-tab { display:flex; align-items:center; gap:8px; padding:10px 14px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--cinza-suave); font:inherit; cursor:pointer; }
+    .mimo-tab.active { color:var(--dourado); border-bottom-color:var(--dourado); font-weight:700; }
+    .mimo-tab span { padding:2px 7px; border-radius:12px; background:rgba(212,175,122,.12); font-size:11px; }
+    /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
     .concluidos-group-cell {
       padding: 0 !important;
       background: rgba(212, 175, 122, 0.06);
@@ -1293,7 +1297,9 @@
     function labelStatusMimo(status) {
       return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',selecao_completa:'Seleção completa',impressao_pendente:'Impressão pendente',entregue:'Entregue'})[status] || 'Aguardando escolha';
     }
-    let abaMimoAtual = "pendentes";\n    function alternarAbaMimo(aba) { abaMimoAtual = aba === "concluidos" ? "concluidos" : "pendentes"; document.getElementById("mimo-tab-pendentes")?.classList.toggle("active", abaMimoAtual === "pendentes"); document.getElementById("mimo-tab-concluidos")?.classList.toggle("active", abaMimoAtual === "concluidos"); renderMimo(); }\n    function renderMimo() {
+    let abaMimoAtual = "pendentes";
+    function alternarAbaMimo(aba) { abaMimoAtual = aba === "concluidos" ? "concluidos" : "pendentes"; document.getElementById("mimo-tab-pendentes")?.classList.toggle("active", abaMimoAtual === "pendentes"); document.getElementById("mimo-tab-concluidos")?.classList.toggle("active", abaMimoAtual === "concluidos"); renderMimo(); }
+    function renderMimo() {
       const tbody = document.getElementById('lista-mimo');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -1330,7 +1336,10 @@
       document.getElementById('mimo-kpi-aguardando').textContent = aguardando;
       document.getElementById('mimo-kpi-parcial').textContent = parcial;
       document.getElementById('mimo-kpi-impressao').textContent = impressao;
-      document.getElementById('mimo-kpi-entregue').textContent = mimosEntregues.length;\n      document.getElementById('mimo-contador-pendentes').textContent = concluidos.length - mimosEntregues.length;\n      document.getElementById('mimo-contador-concluidos').textContent = mimosEntregues.length;\n      document.getElementById('mimo-vazio').textContent = abaMimoAtual === 'concluidos' ? 'Nenhum mimo entregue ainda.' : 'Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.';
+      document.getElementById('mimo-kpi-entregue').textContent = mimosEntregues.length;
+      document.getElementById('mimo-contador-pendentes').textContent = concluidos.length - mimosEntregues.length;
+      document.getElementById('mimo-contador-concluidos').textContent = mimosEntregues.length;
+      document.getElementById('mimo-vazio').textContent = abaMimoAtual === 'concluidos' ? 'Nenhum mimo entregue ainda.' : 'Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.';
       document.getElementById('mimo-vazio').style.display = mostrados ? 'none' : 'block';
     }
     async function salvarMimo(id) {
