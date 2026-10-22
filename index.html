@@ -449,7 +449,7 @@
       .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
+    .mimo-tabs { display:flex; gap:8px; margin:8px 0 14px; border-bottom:1px solid var(--gold-border); }\n    .mimo-tab { display:flex; align-items:center; gap:8px; padding:10px 14px; border:0; border-bottom:2px solid transparent; background:transparent; color:var(--cinza-suave); font:inherit; cursor:pointer; }\n    .mimo-tab.active { color:var(--dourado); border-bottom-color:var(--dourado); font-weight:700; }\n    .mimo-tab span { padding:2px 7px; border-radius:12px; background:rgba(212,175,122,.12); font-size:11px; }\n    /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
     .concluidos-group-cell {
       padding: 0 !important;
       background: rgba(212, 175, 122, 0.06);
@@ -824,7 +824,7 @@
         <div class="kpi-card"><div class="kpi-label">Impressão pendente</div><div class="kpi-value" id="mimo-kpi-impressao">0</div></div>
         <div class="kpi-card"><div class="kpi-label">Mimos entregues</div><div class="kpi-value success" id="mimo-kpi-entregue">0</div></div>
       </section>
-      <div class="filter-bar"><input type="text" id="mimo-filtro-busca" placeholder="Buscar anfitrião..." oninput="renderMimo()" style="min-width:180px;"><select id="mimo-filtro-status" onchange="renderMimo()"><option value="">Todos os status</option><option value="aguardando_escolha">Aguardando escolha</option><option value="escolha_parcial">Escolha parcial</option><option value="selecao_completa">Seleção completa</option><option value="impressao_pendente">Impressão pendente</option><option value="entregue">Entregue</option></select></div>
+      <div class="mimo-tabs"><button type="button" id="mimo-tab-pendentes" class="mimo-tab active" onclick="alternarAbaMimo(\'pendentes\')">Em andamento <span id="mimo-contador-pendentes">0</span></button><button type="button" id="mimo-tab-concluidos" class="mimo-tab" onclick="alternarAbaMimo(\'concluidos\')">Concluídos <span id="mimo-contador-concluidos">0</span></button></div><div class="filter-bar"><input type="text" id="mimo-filtro-busca" placeholder="Buscar anfitrião..." oninput="renderMimo()" style="min-width:180px;"><select id="mimo-filtro-status" onchange="renderMimo()"><option value="">Todos os status</option><option value="aguardando_escolha">Aguardando escolha</option><option value="escolha_parcial">Escolha parcial</option><option value="selecao_completa">Seleção completa</option><option value="impressao_pendente">Impressão pendente</option><option value="entregue">Entregue</option></select></div>
       <div class="table-wrapper"><table style="min-width:1000px;"><thead><tr><th>Evento</th><th>Pacote / direito</th><th>Fotos escolhidas</th><th>Status do mimo</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="lista-mimo"></tbody></table></div>
       <p id="mimo-vazio" class="section-subtitle" style="display:none;text-align:center;padding:24px;">Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.</p>
     </main>
@@ -1293,7 +1293,7 @@
     function labelStatusMimo(status) {
       return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',selecao_completa:'Seleção completa',impressao_pendente:'Impressão pendente',entregue:'Entregue'})[status] || 'Aguardando escolha';
     }
-    function renderMimo() {
+    let abaMimoAtual = "pendentes";\n    function alternarAbaMimo(aba) { abaMimoAtual = aba === "concluidos" ? "concluidos" : "pendentes"; document.getElementById("mimo-tab-pendentes")?.classList.toggle("active", abaMimoAtual === "pendentes"); document.getElementById("mimo-tab-concluidos")?.classList.toggle("active", abaMimoAtual === "concluidos"); renderMimo(); }\n    function renderMimo() {
       const tbody = document.getElementById('lista-mimo');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -1330,7 +1330,7 @@
       document.getElementById('mimo-kpi-aguardando').textContent = aguardando;
       document.getElementById('mimo-kpi-parcial').textContent = parcial;
       document.getElementById('mimo-kpi-impressao').textContent = impressao;
-      document.getElementById('mimo-kpi-entregue').textContent = entregue;
+      document.getElementById('mimo-kpi-entregue').textContent = mimosEntregues.length;\n      document.getElementById('mimo-contador-pendentes').textContent = concluidos.length - mimosEntregues.length;\n      document.getElementById('mimo-contador-concluidos').textContent = mimosEntregues.length;\n      document.getElementById('mimo-vazio').textContent = abaMimoAtual === 'concluidos' ? 'Nenhum mimo entregue ainda.' : 'Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.';
       document.getElementById('mimo-vazio').style.display = mostrados ? 'none' : 'block';
     }
     async function salvarMimo(id) {
