@@ -299,6 +299,22 @@
       background: var(--grafite-input); border: 1px solid var(--gold-border-soft); color: #FFF;
       padding: 7px 12px; border-radius: var(--radius-sm); font-size: 11px; outline: none;
     }
+    .agenda-filter-toolbar { display:flex; align-items:center; gap:10px; width:100%; }
+    .agenda-filter-toolbar #filtro-busca { flex:1; min-width:180px; }
+    .agenda-filter-toggle { position:relative; white-space:nowrap; }
+    .agenda-filter-toggle.has-active { border-color:var(--dourado); color:var(--dourado); }
+    .agenda-filter-count { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:99px; background:var(--dourado); color:#171717; font-size:10px; font-weight:800; }
+    .agenda-filter-panel { display:flex; align-items:center; flex-wrap:wrap; gap:10px; width:100%; padding:12px; border:1px solid var(--gold-border-soft); border-radius:10px; background:rgba(18,20,25,.72); }
+    .agenda-filter-panel label { display:flex; flex-direction:column; gap:5px; color:var(--cinza-suave); font-size:10px; text-transform:uppercase; letter-spacing:.6px; }
+    .agenda-filter-panel input, .agenda-filter-panel select { min-width:150px; }
+    .agenda-filter-panel .filter-clear { margin-left:auto; }
+    @media (max-width:600px) {
+      .agenda-filter-toolbar { flex-wrap:wrap; }
+      .agenda-filter-toolbar #filtro-busca { flex-basis:100%; }
+      .agenda-filter-panel > label { flex:1 1 140px; }
+      .agenda-filter-panel input, .agenda-filter-panel select { width:100%; min-width:0; }
+      .agenda-filter-panel .filter-clear { margin-left:0; }
+    }
 
     .table-wrapper { background: var(--grafite); border: 1px solid var(--gold-border-soft); border-radius: var(--radius-md); overflow-x: auto; }
 
@@ -752,30 +768,48 @@
       </section>
 
       <div class="filter-bar" id="agenda-filter-bar">
-        <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" style="min-width:180px;">
-        <select id="filtro-tipo-evento" onchange="render()" aria-label="Filtrar por tipo de evento">
-          <option value="">Todos os tipos</option>
-          <option value="aniversario">Aniversários</option>
-          <option value="casamento">Casamentos</option>
-          <option value="corporativo">Corporativos</option>
-          <option value="outro">Outros</option>
-        </select>
-        <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()">
-        <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
-          <option value="">Todas as Datas</option>
-          <option value="semana">⭐ Somente Esta Semana</option>
-        </select>
-        <select id="filtro-status" onchange="render()">
-          <option value="">Todos os Status</option>
-          <option value="agendado">Agendados</option>
-          <option value="quitado">Quitados</option>
-          <option value="concluido">Concluídos</option>
-        </select>
-        <select id="filtro-contrato" onchange="render()">
-          <option value="">Contratos</option>
-          <option value="sim">Com Contrato</option>
-          <option value="nao">Sem Contrato</option>
-        </select>
+        <div class="agenda-filter-toolbar">
+          <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" aria-label="Buscar cliente ou evento">
+          <button type="button" class="btn-outline agenda-filter-toggle" id="btn-agenda-filtros" onclick="alternarPainelFiltrosAgenda()" aria-expanded="false" aria-controls="agenda-filter-panel">
+            <i class="fa-solid fa-sliders"></i> Filtros <span id="agenda-filtros-contagem" class="agenda-filter-count" hidden>0</span>
+          </button>
+        </div>
+        <div class="agenda-filter-panel hidden" id="agenda-filter-panel">
+          <label>Tipo de evento
+            <select id="filtro-tipo-evento" onchange="render()" aria-label="Filtrar por tipo de evento">
+              <option value="">Todos os tipos</option>
+              <option value="aniversario">Aniversários</option>
+              <option value="casamento">Casamentos</option>
+              <option value="corporativo">Corporativos</option>
+              <option value="outro">Outros</option>
+            </select>
+          </label>
+          <label>Mês
+            <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()" aria-label="Filtrar por mês">
+          </label>
+          <label>Período
+            <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
+              <option value="">Todas as Datas</option>
+              <option value="semana">⭐ Somente Esta Semana</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="filtro-status" onchange="render()">
+              <option value="">Todos os Status</option>
+              <option value="agendado">Agendados</option>
+              <option value="quitado">Quitados</option>
+              <option value="concluido">Concluídos</option>
+            </select>
+          </label>
+          <label>Contrato
+            <select id="filtro-contrato" onchange="render()">
+              <option value="">Todos</option>
+              <option value="sim">Com Contrato</option>
+              <option value="nao">Sem Contrato</option>
+            </select>
+          </label>
+          <button type="button" class="btn-outline filter-clear" onclick="limparFiltrosAgenda()"><i class="fa-solid fa-rotate-left"></i> Limpar filtros</button>
+        </div>
       </div>
 
       <div class="agenda-dashboard-layout">
@@ -1682,7 +1716,37 @@
       document.getElementById('intel-sem-dados').style.display = selecionados.length ? 'none' : 'block';
     }
 
+    function alternarPainelFiltrosAgenda() {
+      const painel = document.getElementById('agenda-filter-panel');
+      const botao = document.getElementById('btn-agenda-filtros');
+      if (!painel || !botao) return;
+      const abrir = painel.classList.contains('hidden');
+      painel.classList.toggle('hidden', !abrir);
+      botao.setAttribute('aria-expanded', String(abrir));
+    }
+    function limparFiltrosAgenda() {
+      ['filtro-tipo-evento','filtro-mes','filtro-periodo','filtro-status','filtro-contrato'].forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo) campo.value = '';
+      });
+      const mes = document.getElementById('filtro-mes');
+      if (mes) sincronizarMesCalendario('');
+      render();
+    }
+    function atualizarIndicadorFiltrosAgenda() {
+      const ids = ['filtro-tipo-evento','filtro-mes','filtro-periodo','filtro-status','filtro-contrato'];
+      const ativos = ids.reduce((total, id) => total + (document.getElementById(id)?.value ? 1 : 0), 0);
+      const contador = document.getElementById('agenda-filtros-contagem');
+      const botao = document.getElementById('btn-agenda-filtros');
+      if (contador) {
+        contador.textContent = ativos;
+        contador.hidden = ativos === 0;
+      }
+      if (botao) botao.classList.toggle('has-active', ativos > 0);
+    }
+
     function render(){
+      atualizarIndicadorFiltrosAgenda();
       const tbody=document.getElementById('lista-eventos'); tbody.innerHTML='';
       const concluidosTbody=document.getElementById('lista-eventos-concluidos');
       concluidosTbody.innerHTML='';
