@@ -1728,11 +1728,6 @@
         dados.mimoQtdRecebida=original?.mimoQtdRecebida||0;
         dados.mimoStatus=original?.mimoStatus||'';
         dados.mimoObservacao=original?.mimoObservacao||'';
-        // Preserva a configuração manual do Mimo para eventos sem contrato.
-        if (!document.getElementById('ev-mimo-direito').value || document.getElementById('ev-mimo-direito').value==='nao') {
-          dados.mimoTemDireitoManual=!!original?.mimoTemDireitoManual;
-          dados.mimoPacoteManual=original?.mimoPacoteManual||'memorias';
-        }
         // Atualiza a agenda local imediatamente, inclusive no navegador do celular.
         eventos=eventos.map(ev=>ev.id===dados.id?{...ev,...dados}:ev);
         render();
