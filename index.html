@@ -449,6 +449,44 @@
       .kpi-grid { grid-template-columns: 1fr 1fr; }
     }
 
+    /* ===================== ABAS DO MIMO DO ANFITRIÃO ===================== */
+    .mimo-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 14px;
+      border-bottom: 1px solid var(--gold-border-soft);
+    }
+    .mimo-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--cinza-suave);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .mimo-tab.active {
+      color: var(--dourado);
+      border-bottom-color: var(--dourado);
+      font-weight: 700;
+    }
+    .mimo-tab-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border: 1px solid var(--gold-border);
+      border-radius: 20px;
+      font-size: 10px;
+    }
+
     /* ===================== GRUPO DE EVENTOS CONCLUÍDOS ===================== */
     .concluidos-group-cell {
       padding: 0 !important;
@@ -824,9 +862,13 @@
         <div class="kpi-card"><div class="kpi-label">Impressão pendente</div><div class="kpi-value" id="mimo-kpi-impressao">0</div></div>
         <div class="kpi-card"><div class="kpi-label">Mimos entregues</div><div class="kpi-value success" id="mimo-kpi-entregue">0</div></div>
       </section>
-      <div class="filter-bar"><input type="text" id="mimo-filtro-busca" placeholder="Buscar anfitrião..." oninput="renderMimo()" style="min-width:180px;"><select id="mimo-filtro-status" onchange="renderMimo()"><option value="">Todos os status</option><option value="aguardando_escolha">Aguardando escolha</option><option value="escolha_parcial">Escolha parcial</option><option value="selecao_completa">Seleção completa</option><option value="impressao_pendente">Impressão pendente</option><option value="entregue">Entregue</option></select></div>
+      <div class="filter-bar"><input type="text" id="mimo-filtro-busca" placeholder="Buscar anfitrião..." oninput="renderMimo()" style="min-width:180px;"></div>
+      <div class="mimo-tabs" role="tablist" aria-label="Status dos mimos">
+        <button type="button" class="mimo-tab active" id="mimo-tab-andamento" role="tab" aria-selected="true" onclick="switchMimoTab('andamento')">Em andamento <span class="mimo-tab-count" id="mimo-tab-andamento-count">0</span></button>
+        <button type="button" class="mimo-tab" id="mimo-tab-concluidos" role="tab" aria-selected="false" onclick="switchMimoTab('concluidos')">Concluídos <span class="mimo-tab-count" id="mimo-tab-concluidos-count">0</span></button>
+      </div>
       <div class="table-wrapper"><table style="min-width:1000px;"><thead><tr><th>Evento</th><th>Pacote / direito</th><th>Fotos escolhidas</th><th>Status do mimo</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="lista-mimo"></tbody></table></div>
-      <p id="mimo-vazio" class="section-subtitle" style="display:none;text-align:center;padding:24px;">Nenhum evento concluído corresponde aos filtros. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.</p>
+      <p id="mimo-vazio" class="section-subtitle" style="display:none;text-align:center;padding:24px;">Nenhum mimo nesta aba para a busca atual. Eventos sem pacote identificado precisam ter o contrato vinculado no HUB.</p>
     </main>
 
     <!-- APP CONTRATOS -->
@@ -1293,45 +1335,59 @@
     function labelStatusMimo(status) {
       return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',selecao_completa:'Seleção completa',impressao_pendente:'Impressão pendente',entregue:'Entregue'})[status] || 'Aguardando escolha';
     }
+    let mimoAbaAtual = 'andamento';
+    function switchMimoTab(aba) {
+      mimoAbaAtual = aba === 'concluidos' ? 'concluidos' : 'andamento';
+      renderMimo();
+    }
+    function renderMimoLinha(ev) {
+      const esperado = getQtdMimo(ev);
+      const status = getStatusMimo(ev, esperado);
+      const dataFmt = String(ev.data || '').split('-').reverse().join('/');
+      const qtd = Number(ev.mimoQtdRecebida) || 0;
+      const pacote = getNomePacoteMimo(ev);
+      const direito = esperado === 38 ? '37 fotos + 1 especial (38 no total)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
+      const tr = document.createElement('tr');
+      const statusOptions = ['aguardando_escolha','escolha_parcial','selecao_completa','impressao_pendente','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
+      tr.innerHTML =
+        '<td><div class="cliente-nome">' + (ev.cliente || 'Sem nome') + '</div><div class="evento-horario">' + dataFmt + ' · ' + (ev.local || '') + '</div></td>' +
+        '<td><strong>' + (pacote || 'Não identificado') + '</strong><div class="evento-horario">' + direito + '</div>' +
+        (esperado ? '' : '<button class="btn-outline" style="margin-top:6px;padding:5px 8px;" onclick="switchApp(\'contratos\')">Abrir contratos</button>') + '</td>' +
+        '<td style="min-width:145px;"><div style="display:flex;align-items:center;gap:6px;"><input id="mimo-qtd-' + ev.id + '" type="number" min="0" max="' + esperado + '" value="' + qtd + '" style="width:76px;" ' + (!esperado ? 'disabled' : '') + '><span class="evento-horario">/ ' + (esperado || '—') + '</span></div></td>' +
+        '<td style="min-width:175px;"><select id="mimo-status-' + ev.id + '" ' + (!esperado ? 'disabled' : '') + '>' + statusOptions + '</select></td>' +
+        '<td><input id="mimo-obs-' + ev.id + '" type="text" value="' + String(ev.mimoObservacao || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') + '" placeholder="Observação (opcional)" style="min-width:150px;" ' + (!esperado ? 'disabled' : '') + '></td>' +
+        '<td><div class="actions-cell"><button class="btn-gold" style="padding:7px 9px;" onclick="salvarMimo(' + ev.id + ')" ' + (!esperado ? 'disabled' : '') + '>Salvar</button></div></td>';
+      return tr;
+    }
     function renderMimo() {
       const tbody = document.getElementById('lista-mimo');
       if (!tbody) return;
       tbody.innerHTML = '';
       const busca = (document.getElementById('mimo-filtro-busca')?.value || '').toLowerCase().trim();
-      const filtroStatus = document.getElementById('mimo-filtro-status')?.value || '';
       const concluidos = eventos.filter(ev => getStatusReal(ev) === 'concluido' && contratosPorEvento[String(ev.id)]);
-      let aguardando = 0, parcial = 0, impressao = 0, entregue = 0, mostrados = 0;
-      concluidos.forEach(ev => {
-        if (busca && !String(ev.cliente || '').toLowerCase().includes(busca)) return;
-        const esperado = getQtdMimo(ev);
-        const status = getStatusMimo(ev, esperado);
-        if (filtroStatus && status !== filtroStatus) return;
-        mostrados++;
+      const filtrados = concluidos.filter(ev => !busca || String(ev.cliente || '').toLowerCase().includes(busca));
+      const emAndamento = filtrados.filter(ev => getStatusMimo(ev, getQtdMimo(ev)) !== 'entregue');
+      const entregues = filtrados.filter(ev => getStatusMimo(ev, getQtdMimo(ev)) === 'entregue');
+      let aguardando = 0, parcial = 0, impressao = 0;
+      filtrados.forEach(ev => {
+        const status = getStatusMimo(ev, getQtdMimo(ev));
         if (status === 'aguardando_escolha') aguardando++;
         if (status === 'escolha_parcial') parcial++;
         if (status === 'impressao_pendente') impressao++;
-        if (status === 'entregue') entregue++;
-        const dataFmt = String(ev.data || '').split('-').reverse().join('/');
-        const qtd = Number(ev.mimoQtdRecebida) || 0;
-        const pacote = getNomePacoteMimo(ev);
-        const direito = esperado === 38 ? '37 fotos + 1 especial (38 no total)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
-        const tr = document.createElement('tr');
-        const statusOptions = ['aguardando_escolha','escolha_parcial','selecao_completa','impressao_pendente','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
-        tr.innerHTML =
-          '<td><div class="cliente-nome">' + (ev.cliente || 'Sem nome') + '</div><div class="evento-horario">' + dataFmt + ' · ' + (ev.local || '') + '</div></td>' +
-          '<td><strong>' + (pacote || 'Não identificado') + '</strong><div class="evento-horario">' + direito + '</div>' +
-          (esperado ? '' : '<button class="btn-outline" style="margin-top:6px;padding:5px 8px;" onclick="switchApp(\'contratos\')">Abrir contratos</button>') + '</td>' +
-          '<td style="min-width:145px;"><div style="display:flex;align-items:center;gap:6px;"><input id="mimo-qtd-' + ev.id + '" type="number" min="0" max="' + esperado + '" value="' + qtd + '" style="width:76px;" ' + (!esperado ? 'disabled' : '') + '><span class="evento-horario">/ ' + (esperado || '—') + '</span></div></td>' +
-          '<td style="min-width:175px;"><select id="mimo-status-' + ev.id + '" ' + (!esperado ? 'disabled' : '') + '>' + statusOptions + '</select></td>' +
-          '<td><input id="mimo-obs-' + ev.id + '" type="text" value="' + String(ev.mimoObservacao || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') + '" placeholder="Observação (opcional)" style="min-width:150px;" ' + (!esperado ? 'disabled' : '') + '></td>' +
-          '<td><div class="actions-cell"><button class="btn-gold" style="padding:7px 9px;" onclick="salvarMimo(' + ev.id + ')" ' + (!esperado ? 'disabled' : '') + '>Salvar</button></div></td>';
-        tbody.appendChild(tr);
       });
+      document.getElementById('mimo-tab-andamento-count').textContent = emAndamento.length;
+      document.getElementById('mimo-tab-concluidos-count').textContent = entregues.length;
+      document.getElementById('mimo-tab-andamento').classList.toggle('active', mimoAbaAtual === 'andamento');
+      document.getElementById('mimo-tab-andamento').setAttribute('aria-selected', String(mimoAbaAtual === 'andamento'));
+      document.getElementById('mimo-tab-concluidos').classList.toggle('active', mimoAbaAtual === 'concluidos');
+      document.getElementById('mimo-tab-concluidos').setAttribute('aria-selected', String(mimoAbaAtual === 'concluidos'));
       document.getElementById('mimo-kpi-aguardando').textContent = aguardando;
       document.getElementById('mimo-kpi-parcial').textContent = parcial;
       document.getElementById('mimo-kpi-impressao').textContent = impressao;
-      document.getElementById('mimo-kpi-entregue').textContent = entregue;
-      document.getElementById('mimo-vazio').style.display = mostrados ? 'none' : 'block';
+      document.getElementById('mimo-kpi-entregue').textContent = entregues.length;
+      const listaAtual = mimoAbaAtual === 'concluidos' ? entregues : emAndamento;
+      listaAtual.forEach(ev => tbody.appendChild(renderMimoLinha(ev)));
+      document.getElementById('mimo-vazio').style.display = listaAtual.length ? 'none' : 'block';
     }
     async function salvarMimo(id) {
       const ev = eventos.find(item => String(item.id) === String(id));
