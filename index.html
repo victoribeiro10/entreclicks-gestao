@@ -729,6 +729,7 @@
         <button class="hub-tab active" id="tab-gestao" onclick="switchApp('gestao')"><i class="fa-regular fa-calendar-check"></i> Gestão e Agenda</button>
         <button class="hub-tab" id="tab-contratos" onclick="switchApp('contratos')"><i class="fa-solid fa-file-signature"></i> Gerador de Contratos</button>
         <button class="hub-tab" id="tab-mimo" onclick="switchApp('mimo')"><i class="fa-solid fa-gift"></i> Mimo do Anfitrião</button>
+        <button class="hub-tab" id="tab-inteligencia" onclick="switchApp('inteligencia')"><i class="fa-solid fa-chart-column"></i> Inteligência Comercial</button>
         <button class="hub-tab" id="tab-impressao" onclick="switchApp('impressao')"><i class="fa-solid fa-print"></i> Central de Impressão</button>
       </nav>
     </header>
@@ -851,6 +852,43 @@
           <tbody id="lista-eventos-concluidos" class="hidden"></tbody>
         </table>
       </div>
+    </main>
+
+    <!-- APP INTELIGÊNCIA COMERCIAL -->
+    <main id="app-inteligencia" class="main-container hidden">
+      <section class="agenda-hero">
+        <div class="agenda-eyebrow">DADOS DO NEGÓCIO · ENTRECLICKS</div>
+        <h1>Inteligência Comercial</h1>
+        <p>Entenda quais tipos de evento mais movimentam sua agenda e seu faturamento.</p>
+      </section>
+      <div class="filter-bar" style="margin-bottom:18px;">
+        <label for="inteligencia-periodo" style="font-size:12px;color:var(--cinza-suave);">Período de análise</label>
+        <select id="inteligencia-periodo" onchange="renderInteligenciaComercial()">
+          <option value="todos">Todo o histórico</option>
+          <option value="ano">Ano atual</option>
+          <option value="12meses">Últimos 12 meses</option>
+        </select>
+        <button type="button" class="btn-outline" onclick="renderInteligenciaComercial()"><i class="fa-solid fa-rotate"></i> Atualizar análise</button>
+      </div>
+      <section class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-label">Eventos no período</div><div class="kpi-value gold" id="intel-total-eventos">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Eventos realizados</div><div class="kpi-value success" id="intel-realizados">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor total previsto</div><div class="kpi-value gold" id="intel-previsto">R$ 0,00</div></div>
+        <div class="kpi-card"><div class="kpi-label">Valor recebido registrado</div><div class="kpi-value success" id="intel-recebido">R$ 0,00</div></div>
+      </section>
+      <section class="calendar-panel" style="margin-bottom:18px;">
+        <div class="section-header" style="margin-bottom:14px;">
+          <div><h2 class="section-title">Comparativo por tipo de evento</h2><p class="section-subtitle">A participação é calculada pela quantidade de eventos no período selecionado.</p></div>
+        </div>
+        <div class="table-wrapper">
+          <table style="min-width:720px;">
+            <thead><tr><th>Tipo de evento</th><th>Quantidade</th><th>Participação</th><th>Realizados</th><th>Valor previsto</th><th>Recebido</th><th>Ticket médio realizado</th></tr></thead>
+            <tbody id="intel-tabela-tipos"></tbody>
+          </table>
+        </div>
+        <p id="intel-sem-dados" class="section-subtitle" style="display:none;text-align:center;padding:24px;">Não há eventos nesse período.</p>
+      </section>
+      <p class="section-subtitle" style="line-height:1.7;">Como ler os números: <strong>valor previsto</strong> soma o valor total cadastrado dos eventos do período, inclusive futuros. <strong>Recebido</strong> soma os pagamentos registrados no HUB. <strong>Ticket médio realizado</strong> considera apenas eventos concluídos. Os valores dependem de os pagamentos e tipos de evento estarem corretamente cadastrados.</p>
     </main>
 
     <!-- APP MIMO DO ANFITRIÃO -->
@@ -1068,6 +1106,7 @@
       document.getElementById('app-contratos').classList.add('hidden');
       document.getElementById('app-impressao').classList.add('hidden');
       document.getElementById('app-mimo').classList.add('hidden');
+      document.getElementById('app-inteligencia').classList.add('hidden');
       document.getElementById('app-' + appId).classList.remove('hidden');
 
       const headerActions = document.getElementById('header-actions-gestao');
@@ -1075,6 +1114,7 @@
       autorizarIframes();
       if (appId === 'contratos' || appId === 'mimo') setTimeout(solicitarStatusContratos, 300);
       if (appId === 'mimo') setTimeout(renderMimo, 600);
+      if (appId === 'inteligencia') renderInteligenciaComercial();
     }
 
     // ===================== GESTÃO =====================
@@ -1581,6 +1621,59 @@
       document.getElementById('calendar-empty').classList.toggle('hidden', doMes.length > 0);
     }
 
+    function renderInteligenciaComercial() {
+      const corpo = document.getElementById('intel-tabela-tipos');
+      if (!corpo) return;
+      const filtro = document.getElementById('inteligencia-periodo')?.value || 'todos';
+      const agora = new Date();
+      const inicio12 = new Date(agora.getFullYear(), agora.getMonth() - 11, 1);
+      const selecionados = eventos.filter(ev => {
+        if (filtro === 'todos') return true;
+        if (!ev.data) return false;
+        const partes = ev.data.split('-').map(Number);
+        const data = new Date(partes[0], partes[1] - 1, partes[2]);
+        if (Number.isNaN(data.getTime())) return false;
+        if (filtro === 'ano') return data.getFullYear() === agora.getFullYear();
+        return data >= inicio12;
+      });
+      const tipos = [
+        { id: 'aniversario', nome: 'Aniversários' },
+        { id: 'casamento', nome: 'Casamentos' },
+        { id: 'corporativo', nome: 'Corporativos' },
+        { id: 'outro', nome: 'Outros / não informado' }
+      ];
+      const formatar = valor => formatMoney(Number(valor) || 0);
+      const totalPrevisto = selecionados.reduce((s, ev) => s + getValorTotal(ev), 0);
+      const totalRecebido = selecionados.reduce((s, ev) => s + (Number(ev.pago) || 0), 0);
+      const totalRealizados = selecionados.filter(ev => getStatusReal(ev) === 'concluido').length;
+      document.getElementById('intel-total-eventos').textContent = selecionados.length;
+      document.getElementById('intel-realizados').textContent = totalRealizados;
+      document.getElementById('intel-previsto').textContent = formatar(totalPrevisto);
+      document.getElementById('intel-recebido').textContent = formatar(totalRecebido);
+      const resumo = tipos.map(tipo => {
+        const lista = selecionados.filter(ev => classeTipoEvento(ev) === tipo.id);
+        const realizados = lista.filter(ev => getStatusReal(ev) === 'concluido');
+        const previsto = lista.reduce((s, ev) => s + getValorTotal(ev), 0);
+        const recebido = lista.reduce((s, ev) => s + (Number(ev.pago) || 0), 0);
+        const valorRealizado = realizados.reduce((s, ev) => s + getValorTotal(ev), 0);
+        return { ...tipo, quantidade: lista.length, realizados: realizados.length, previsto, recebido,
+          participacao: selecionados.length ? lista.length / selecionados.length * 100 : 0,
+          ticket: realizados.length ? valorRealizado / realizados.length : 0 };
+      });
+      corpo.innerHTML = resumo.map(item => {
+        const pct = item.participacao.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+        const barra = item.quantidade ? '<div style="height:5px;min-width:44px;background:var(--gold-border-soft);border-radius:99px;overflow:hidden;"><div style="height:100%;width:' + item.participacao + '%;background:var(--dourado);border-radius:99px;"></div></div>' : '<span style="color:var(--cinza-suave);">—</span>';
+        return '<tr><td><strong>' + item.nome + '</strong></td>' +
+          '<td>' + item.quantidade + '</td>' +
+          '<td><div style="display:flex;align-items:center;gap:8px;min-width:105px;"><span style="min-width:38px;">' + pct + '%</span>' + barra + '</div></td>' +
+          '<td>' + item.realizados + '</td>' +
+          '<td>' + formatar(item.previsto) + '</td>' +
+          '<td>' + formatar(item.recebido) + '</td>' +
+          '<td>' + (item.realizados ? formatar(item.ticket) : '—') + '</td></tr>';
+      }).join('');
+      document.getElementById('intel-sem-dados').style.display = selecionados.length ? 'none' : 'block';
+    }
+
     function render(){
       const tbody=document.getElementById('lista-eventos'); tbody.innerHTML='';
       const concluidosTbody=document.getElementById('lista-eventos-concluidos');
@@ -1682,6 +1775,7 @@
       document.getElementById('kpi-concluidos').innerText=concluidos;
       renderCalendario(busca, periodo, statusF, contratoF);
       renderProximosEventos();
+      if (!document.getElementById('app-inteligencia').classList.contains('hidden')) renderInteligenciaComercial();
       alternarVisaoAgenda(visaoAgenda);
       localStorage.setItem('ec_eventos_v8', JSON.stringify(eventos));
     }
