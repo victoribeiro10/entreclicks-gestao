@@ -753,6 +753,13 @@
 
       <div class="filter-bar" id="agenda-filter-bar">
         <input type="text" id="filtro-busca" placeholder="Buscar cliente..." oninput="render()" style="min-width:180px;">
+        <select id="filtro-tipo-evento" onchange="render()" aria-label="Filtrar por tipo de evento">
+          <option value="">Todos os tipos</option>
+          <option value="aniversario">Aniversários</option>
+          <option value="casamento">Casamentos</option>
+          <option value="corporativo">Corporativos</option>
+          <option value="outro">Outros</option>
+        </select>
         <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()">
         <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
           <option value="">Todas as Datas</option>
@@ -1574,7 +1581,7 @@
       }).join('');
     }
 
-    function renderCalendario(busca, periodo, statusF, contratoF) {
+    function renderCalendario(busca, periodo, statusF, contratoF, tipoF) {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       const ano = mesCalendario.getFullYear();
@@ -1589,6 +1596,7 @@
         if (periodo === 'semana' && !isNaSemanaAtual(ev.data)) return false;
         if (statusF && st !== statusF) return false;
         if (contratoF && ev.contrato !== contratoF) return false;
+        if (tipoF && classeTipoEvento(ev) !== tipoF) return false;
         return true;
       }).sort((a,b) => (a.data || '').localeCompare(b.data || '') || (a.inicio || '').localeCompare(b.inicio || ''));
 
@@ -1683,6 +1691,7 @@
       const periodo=document.getElementById('filtro-periodo').value;
       const statusF=document.getElementById('filtro-status').value;
       const contratoF=document.getElementById('filtro-contrato').value;
+      const tipoF=document.getElementById('filtro-tipo-evento').value;
 
       let fat=0, receber=0, concluidos=0, semana=0;
       eventos.forEach(ev=>{ if(isNaSemanaAtual(ev.data)&&ev.status!=='concluido') semana++; });
@@ -1707,6 +1716,7 @@
         if(periodo==='semana' && !naSemana) return;
         if(statusF && st!==statusF) return;
         if(contratoF && ev.contrato!==contratoF) return;
+        if(tipoF && classeTipoEvento(ev)!==tipoF) return;
 
         if(st==='concluido') concluidos++;
         const total=getValorTotal(ev), saldo=getSaldoRestante(ev), dias=diasParaEvento(ev);
@@ -1773,7 +1783,7 @@
       document.getElementById('kpi-fat').innerText=formatMoney(fat);
       document.getElementById('kpi-receber').innerText=formatMoney(receber);
       document.getElementById('kpi-concluidos').innerText=concluidos;
-      renderCalendario(busca, periodo, statusF, contratoF);
+      renderCalendario(busca, periodo, statusF, contratoF, tipoF);
       renderProximosEventos();
       if (!document.getElementById('app-inteligencia').classList.contains('hidden')) renderInteligenciaComercial();
       alternarVisaoAgenda(visaoAgenda);
