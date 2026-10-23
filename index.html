@@ -775,15 +775,6 @@
           </button>
         </div>
         <div class="agenda-filter-panel hidden" id="agenda-filter-panel">
-          <label>Tipo de evento
-            <select id="filtro-tipo-evento" onchange="render()" aria-label="Filtrar por tipo de evento">
-              <option value="">Todos os tipos</option>
-              <option value="aniversario">Aniversários</option>
-              <option value="casamento">Casamentos</option>
-              <option value="corporativo">Corporativos</option>
-              <option value="outro">Outros</option>
-            </select>
-          </label>
           <label>Mês
             <input type="month" id="filtro-mes" onchange="sincronizarMesCalendario(this.value);render()" aria-label="Filtrar por mês">
           </label>
@@ -791,6 +782,15 @@
             <select id="filtro-periodo" onchange="render()" style="border-color: var(--destaque-semana-border); color: var(--destaque-semana);">
               <option value="">Todas as Datas</option>
               <option value="semana">⭐ Somente Esta Semana</option>
+            </select>
+          </label>
+          <label>Tipo de evento
+            <select id="filtro-tipo-evento" onchange="render()" aria-label="Filtrar por tipo de evento">
+              <option value="">Todos os tipos</option>
+              <option value="aniversario">Aniversários</option>
+              <option value="casamento">Casamentos</option>
+              <option value="corporativo">Corporativos</option>
+              <option value="outro">Outros</option>
             </select>
           </label>
           <label>Status
