@@ -981,7 +981,7 @@
     <!-- APP IMPRESSÃO -->
     <main id="app-impressao" class="main-container hidden">
       <div class="iframe-wrapper">
-        <iframe src="https://moldura-app.vercel.app/admin" title="Central de Impressão"></iframe>
+        <iframe src="https://moldura-app-git-fix-origem-hub-producao-entreclicks-projects.vercel.app/admin" title="Central de Impressão"></iframe>
       </div>
     </main>
   </div>
@@ -1114,7 +1114,7 @@
       if (!isLogado()) return;
       [
         { selector: '#app-contratos iframe', origin: 'https://contratos-brown.vercel.app' },
-        { selector: '#app-impressao iframe', origin: 'https://moldura-app.vercel.app' }
+        { selector: '#app-impressao iframe', origin: 'https://moldura-app-git-fix-origem-hub-producao-entreclicks-projects.vercel.app' }
       ].forEach(destino => {
         const iframe = document.querySelector(destino.selector);
         if (iframe && iframe.contentWindow) {
@@ -1127,7 +1127,7 @@
       const contrato = document.querySelector('#app-contratos iframe');
       const impressao = document.querySelector('#app-impressao iframe');
       const origemContratos = event.origin === 'https://contratos-brown.vercel.app' && contrato && event.source === contrato.contentWindow;
-      const origemImpressao = event.origin === 'https://moldura-app.vercel.app' && impressao && event.source === impressao.contentWindow;
+      const origemImpressao = event.origin === 'https://moldura-app-git-fix-origem-hub-producao-entreclicks-projects.vercel.app' && impressao && event.source === impressao.contentWindow;
       if (!origemContratos && !origemImpressao) return;
       if (event.data?.type === 'EC_HUB_AUTH_REQUEST') {
         if (isLogado()) event.source.postMessage({ type: 'EC_HUB_AUTHORIZED' }, event.origin);
