@@ -931,12 +931,12 @@
         </section>
         <section class="calendar-panel" style="padding:20px;">
           <h2 class="section-title">Calculadora da caixinha</h2>
-          <p class="section-subtitle" style="margin:6px 0 14px;">A cada pagamento, separe 25% manualmente no Infinity. O HUB não movimenta dinheiro.</p>
+          <p class="section-subtitle" style="margin:6px 0 14px;">A cada pagamento, separe 20% manualmente no Infinity. O HUB não movimenta dinheiro.</p>
           <label for="intel-valor-pagamento" style="display:block;margin-bottom:6px;">Pagamento recebido (R$)</label>
           <input id="intel-valor-pagamento" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 450,00" oninput="calcularCaixinhaIntel()" style="width:100%;padding:11px;border:1px solid var(--gold-border-soft);border-radius:9px;background:transparent;color:inherit;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
-            <div><div class="section-subtitle">Guardar (25%)</div><strong id="intel-caixinha-reserva" style="font-size:21px;color:var(--dourado);">R$ 0,00</strong></div>
-            <div><div class="section-subtitle">Uso livre (75%)</div><strong id="intel-caixinha-livre" style="font-size:21px;">R$ 0,00</strong></div>
+            <div><div class="section-subtitle">Guardar (20%)</div><strong id="intel-caixinha-reserva" style="font-size:21px;color:var(--dourado);">R$ 0,00</strong></div>
+            <div><div class="section-subtitle">Disponível na conta (80%)</div><strong id="intel-caixinha-livre" style="font-size:21px;">R$ 0,00</strong></div>
           </div>
           <button type="button" class="btn-outline" onclick="copiarCaixinhaIntel()" style="margin-top:14px;"><i class="fa-solid fa-copy"></i> Copiar valor para guardar</button>
           <p class="section-subtitle" style="margin-top:10px;">Cálculo informativo. Não registra recebimentos nem verifica saldo da caixinha.</p>
@@ -1808,12 +1808,12 @@
       const campo = document.getElementById('intel-valor-pagamento');
       if (!campo) return;
       const valor = Math.max(0, Number(campo.value) || 0);
-      document.getElementById('intel-caixinha-reserva').textContent = formatMoney(valor * 0.25);
-      document.getElementById('intel-caixinha-livre').textContent = formatMoney(valor * 0.75);
+      document.getElementById('intel-caixinha-reserva').textContent = formatMoney(valor * 0.20);
+      document.getElementById('intel-caixinha-livre').textContent = formatMoney(valor * 0.80);
     }
     function copiarCaixinhaIntel() {
       const valor = Math.max(0, Number(document.getElementById('intel-valor-pagamento')?.value) || 0);
-      const texto = (Math.round(valor * 25) / 100).toFixed(2).replace('.', ',');
+      const texto = (Math.round(valor * 20) / 100).toFixed(2).replace('.', ',');
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(texto).catch(() => window.prompt('Copie o valor para a caixinha:', texto));
       } else {
