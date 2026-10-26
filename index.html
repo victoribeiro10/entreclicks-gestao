@@ -1737,7 +1737,7 @@
       document.getElementById('intel-sem-dados').style.display = selecionados.length ? 'none' : 'block';
       // Visão de evolução independente do filtro geral: janela móvel de 12 meses.
       const mesChave = (ano, mes) => ano + '-' + String(mes + 1).padStart(2, '0');
-      const mesValido = ev => /^\\d{4}-\\d{2}-\\d{2}$/.test(ev.data || '');
+      const mesValido = ev => /^\d{4}-\d{2}-\d{2}$/.test(ev.data || '');
       const nomeMes = data => data.toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
       const janela = Array.from({length:12}, (_, i) => new Date(agora.getFullYear(), agora.getMonth() - 11 + i, 1));
       const dadosMes = janela.map(d => {
@@ -1774,7 +1774,7 @@
           '<span style="text-transform:capitalize;">' + nome + '</span><span style="font-weight:700;">' + m.qtd + ' evento(s)' +
           (precisa ? ' <span style="font-size:10px;color:var(--alerta);">• atenção</span>' : '') + '</span></div>';
       }).join('') + '<p class="section-subtitle" style="margin-top:12px;">Atenção = abaixo da média de ' + media.toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' evento(s)/mês nesta janela. Não é previsão de demanda.</p>';
-      const telefoneChave = ev => String(ev.telefone || '').replace(/\\D/g, '');
+      const telefoneChave = ev => String(ev.telefone || '').replace(/\D/g, '');
       const hojeChave = [agora.getFullYear(), String(agora.getMonth()+1).padStart(2,'0'), String(agora.getDate()).padStart(2,'0')].join('-');
       const elegiveis = eventos.filter(ev => mesValido(ev) && ev.data < hojeChave &&
         ['aniversario','corporativo'].includes(classeTipoEvento(ev)) && telefoneChave(ev).length >= 10);
