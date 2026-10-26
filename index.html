@@ -919,12 +919,29 @@
         <div class="kpi-card"><div class="kpi-label">Valor total previsto</div><div class="kpi-value gold" id="intel-previsto">R$ 0,00</div></div>
         <div class="kpi-card"><div class="kpi-label">Valor recebido registrado</div><div class="kpi-value success" id="intel-recebido">R$ 0,00</div></div>
       </section>
-      <section class="calendar-panel" style="margin-bottom:18px;padding:20px;">
-        <h2 class="section-title">Evolução mensal</h2>
-        <p class="section-subtitle" style="margin:6px 0 18px;">Últimos 12 meses: eventos realizados, agendados e valor total previsto por mês do evento.</p>
-        <div id="intel-evolucao" style="display:flex;align-items:flex-end;gap:9px;overflow-x:auto;min-height:220px;padding:10px 2px 6px;"></div>
-        <p class="section-subtitle" style="margin-top:10px;">Valores vinculados à data do evento, não à data em que o pagamento entrou.</p>
-      </section>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;margin-bottom:18px;">
+        <section class="calendar-panel" style="padding:20px;">
+          <h2 class="section-title">Meta: agenda sempre cheia</h2>
+          <p class="section-subtitle" style="margin:6px 0 14px;">Manter pelo menos 10 eventos futuros confirmados. Atualização automática pela agenda.</p>
+          <div class="kpi-value gold" id="intel-meta-agenda" style="font-size:34px;">0 / 10</div>
+          <div style="height:10px;background:var(--gold-border-soft);border-radius:20px;overflow:hidden;margin:12px 0;">
+            <div id="intel-meta-agenda-barra" style="height:100%;width:0%;background:var(--dourado);border-radius:20px;"></div>
+          </div>
+          <p id="intel-meta-agenda-texto" class="section-subtitle"></p>
+        </section>
+        <section class="calendar-panel" style="padding:20px;">
+          <h2 class="section-title">Calculadora da caixinha</h2>
+          <p class="section-subtitle" style="margin:6px 0 14px;">A cada pagamento, separe 20% manualmente no Infinity. O HUB não movimenta dinheiro.</p>
+          <label for="intel-valor-pagamento" style="display:block;margin-bottom:6px;">Pagamento recebido (R$)</label>
+          <input id="intel-valor-pagamento" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 450,00" oninput="calcularCaixinhaIntel()" style="width:100%;padding:11px;border:1px solid var(--gold-border-soft);border-radius:9px;background:transparent;color:inherit;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+            <div><div class="section-subtitle">Guardar (20%)</div><strong id="intel-caixinha-reserva" style="font-size:21px;color:var(--dourado);">R$ 0,00</strong></div>
+            <div><div class="section-subtitle">Disponível na conta (80%)</div><strong id="intel-caixinha-livre" style="font-size:21px;">R$ 0,00</strong></div>
+          </div>
+          <button type="button" class="btn-outline" onclick="copiarCaixinhaIntel()" style="margin-top:14px;"><i class="fa-solid fa-copy"></i> Copiar valor para guardar</button>
+          <p class="section-subtitle" style="margin-top:10px;">Cálculo informativo. Não registra recebimentos nem verifica saldo da caixinha.</p>
+        </section>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:18px;">
         <section class="calendar-panel" style="padding:20px;">
           <h2 class="section-title">Radar de oportunidades</h2>
@@ -1735,31 +1752,18 @@
           '<td>' + (item.realizados ? formatar(item.ticket) : '—') + '</td></tr>';
       }).join('');
       document.getElementById('intel-sem-dados').style.display = selecionados.length ? 'none' : 'block';
-      // Visão de evolução independente do filtro geral: janela móvel de 12 meses.
       const mesChave = (ano, mes) => ano + '-' + String(mes + 1).padStart(2, '0');
       const mesValido = ev => /^\d{4}-\d{2}-\d{2}$/.test(ev.data || '');
       const nomeMes = data => data.toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
-      const janela = Array.from({length:12}, (_, i) => new Date(agora.getFullYear(), agora.getMonth() - 11 + i, 1));
-      const dadosMes = janela.map(d => {
-        const chave = mesChave(d.getFullYear(), d.getMonth());
-        const lista = eventos.filter(ev => mesValido(ev) && ev.data.startsWith(chave));
-        return {d, lista, realizados:lista.filter(ev => getStatusReal(ev) === 'concluido').length,
-          previsto:lista.reduce((s, ev) => s + getValorTotal(ev), 0)};
-      });
-      const maxEventos = Math.max(1, ...dadosMes.map(m => m.lista.length));
-      document.getElementById('intel-evolucao').innerHTML = dadosMes.map(m => {
-        const altura = Math.max(3, Math.round(m.lista.length / maxEventos * 132));
-        const pctRealizado = m.lista.length ? m.realizados / m.lista.length * 100 : 0;
-        const legenda = nomeMes(m.d) + '/' + String(m.d.getFullYear()).slice(2);
-        return '<div style="flex:1 0 48px;min-width:48px;text-align:center;" title="' + legenda + ': ' + m.lista.length + ' eventos; ' + formatar(m.previsto) + ' previstos">' +
-          '<div style="font-size:12px;font-weight:700;margin-bottom:5px;">' + m.lista.length + '</div>' +
-          '<div style="height:140px;display:flex;align-items:flex-end;justify-content:center;">' +
-          '<div style="width:28px;height:' + altura + 'px;background:var(--gold-border-soft);border:1px solid var(--dourado);border-radius:5px 5px 0 0;display:flex;align-items:flex-end;overflow:hidden;">' +
-          '<div style="width:100%;height:' + pctRealizado + '%;background:var(--dourado);"></div></div></div>' +
-          '<div style="font-size:11px;margin-top:6px;white-space:nowrap;">' + legenda + '</div>' +
-          '<div style="font-size:10px;color:var(--cinza-suave);white-space:nowrap;">' + m.realizados + ' feitos</div>' +
-          '<div style="font-size:10px;color:var(--cinza-suave);white-space:nowrap;">' + formatar(m.previsto) + '</div></div>';
-      }).join('');
+      const hojeAgenda = [agora.getFullYear(), String(agora.getMonth()+1).padStart(2,'0'), String(agora.getDate()).padStart(2,'0')].join('-');
+      const agendaFutura = eventos.filter(ev => mesValido(ev) && ev.data >= hojeAgenda &&
+        !['concluido','cancelado'].includes(getStatusReal(ev)));
+      const qtdAgenda = agendaFutura.length;
+      document.getElementById('intel-meta-agenda').textContent = qtdAgenda + ' / 10';
+      document.getElementById('intel-meta-agenda-barra').style.width = Math.min(100, qtdAgenda * 10) + '%';
+      document.getElementById('intel-meta-agenda-texto').textContent = qtdAgenda >= 10
+        ? 'Meta atingida! Continue repondo os eventos realizados.'
+        : 'Faltam ' + (10 - qtdAgenda) + ' evento(s) futuro(s) para completar a meta.';
       const futuros = Array.from({length:6}, (_, i) => new Date(agora.getFullYear(), agora.getMonth() + i, 1));
       const oportunidades = futuros.map(d => {
         const chave = mesChave(d.getFullYear(), d.getMonth());
@@ -1798,6 +1802,23 @@
         '</div><div class="section-subtitle">' + escaparIntel(ev.telefone) + '</div></div>'
       ).join('') : '<p class="section-subtitle">Nenhum cliente elegível identificado nos registros atuais.</p>';
 
+    }
+
+    function calcularCaixinhaIntel() {
+      const campo = document.getElementById('intel-valor-pagamento');
+      if (!campo) return;
+      const valor = Math.max(0, Number(campo.value) || 0);
+      document.getElementById('intel-caixinha-reserva').textContent = formatMoney(valor * 0.20);
+      document.getElementById('intel-caixinha-livre').textContent = formatMoney(valor * 0.80);
+    }
+    function copiarCaixinhaIntel() {
+      const valor = Math.max(0, Number(document.getElementById('intel-valor-pagamento')?.value) || 0);
+      const texto = (Math.round(valor * 20) / 100).toFixed(2).replace('.', ',');
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto).catch(() => window.prompt('Copie o valor para a caixinha:', texto));
+      } else {
+        window.prompt('Copie o valor para a caixinha:', texto);
+      }
     }
 
     function alternarPainelFiltrosAgenda() {
