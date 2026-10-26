@@ -1737,7 +1737,7 @@
       document.getElementById('intel-sem-dados').style.display = selecionados.length ? 'none' : 'block';
       // Visão de evolução independente do filtro geral: janela móvel de 12 meses.
       const mesChave = (ano, mes) => ano + '-' + String(mes + 1).padStart(2, '0');
-      const mesValido = ev => /^\\d{4}-\\d{2}-\\d{2}$/.test(ev.data || '');
+      const mesValido = ev => /^\d{4}-\d{2}-\d{2}$/.test(ev.data || '');
       const nomeMes = data => data.toLocaleDateString('pt-BR', {month:'short'}).replace('.', '');
       const janela = Array.from({length:12}, (_, i) => new Date(agora.getFullYear(), agora.getMonth() - 11 + i, 1));
       const dadosMes = janela.map(d => {
