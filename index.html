@@ -1790,9 +1790,7 @@
       const candidatos = [...porCliente.values()].filter(ev => !eventos.some(outro =>
         telefoneChave(outro) === telefoneChave(ev) && mesValido(outro) && outro.data >= hojeChave))
         .sort((a,b) => {
-          const mesesA = (Number(a.data.slice(5,7)) - (agora.getMonth()+1) + 12) % 12;
-          const mesesB = (Number(b.data.slice(5,7)) - (agora.getMonth()+1) + 12) % 12;
-          return mesesA - mesesB || b.data.localeCompare(a.data);
+          return a.data.localeCompare(b.data);
         }).slice(0,6);
       const escaparIntel = valor => String(valor || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
       document.getElementById('intel-recontatos').innerHTML = candidatos.length ? candidatos.map(ev =>
