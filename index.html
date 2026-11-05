@@ -664,7 +664,7 @@
     .upcoming-heading h2 {font-family:'DM Sans',sans-serif;font-size:16px;color:#f3f4f6;font-weight:700;margin-bottom:4px;}
     .upcoming-heading p {font-size:10px;color:#969daa;}
     .upcoming-day-label {font-size:10px;font-weight:700;color:#eab66b;text-transform:uppercase;margin:15px 0 8px;}
-    .upcoming-event {display:grid;grid-template-columns:42px 3px minmax(0,1fr);gap:10px;padding:11px 0;border-bottom:1px solid #292c33;align-items:stretch;cursor:pointer;}
+    .upcoming-event {display:grid;grid-template-columns:42px 3px minmax(0,1fr) auto;gap:10px;padding:11px 0;border-bottom:1px solid #292c33;align-items:stretch;cursor:pointer;}
     .upcoming-event:last-child {border-bottom:0;}
     .upcoming-time {font-size:10px;color:#b7c7e5;padding-top:2px;white-space:nowrap;}
     .upcoming-event-bar {border-radius:5px;background:#b99af7;min-height:40px;}
@@ -1650,7 +1650,8 @@
         const badge = st === 'quitado' ? 'green' : (saldo > 0 ? 'gold' : '');
         const label = dia !== diaAtual ? '<div class="upcoming-day-label">'+dia+'</div>' : '';
         diaAtual = dia;
-        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\'Enter\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="tipo-evento-tag '+cor+'">'+tipoLabel+'</span><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div></div>';
+        const whatsapp = isNaSemanaAtual(ev.data) && ev.telefone ? '<button type="button" class="btn-icon btn-whatsapp-ic" title="Enviar lembrete pelo WhatsApp" aria-label="Enviar lembrete pelo WhatsApp" onclick="event.stopPropagation();enviarLembreteEvento('+Number(ev.id)+')" onkeydown="event.stopPropagation()" style="margin-left:auto;align-self:center;flex-shrink:0;"><i class="fa-brands fa-whatsapp"></i></button>' : '';
+        return label+'<div class="upcoming-event" role="button" tabindex="0" onclick="editarEvento('+Number(ev.id)+')" onkeydown="if(event.key===\'Enter\')editarEvento('+Number(ev.id)+')"><div class="upcoming-time">'+escaparTextoCalendario(horario)+'</div><div class="upcoming-event-bar '+cor+'"></div><div><div class="upcoming-event-name">'+nome+'</div><div class="upcoming-event-meta">'+local+'</div><span class="tipo-evento-tag '+cor+'">'+tipoLabel+'</span><span class="upcoming-event-badge '+badge+'">'+statusLabel+'</span></div>'+whatsapp+'</div>';
       }).join('');
     }
 
@@ -1943,7 +1944,7 @@
               <button class="btn-icon btn-edit-ic" title="Gerar contrato com os dados deste evento" onclick="gerarContratoEvento(${ev.id})"><i class="fa-solid fa-file-contract"></i></button>
               ${st!=='concluido'?`<button class="btn-pagamento-sm" onclick="openModalPagamento(${ev.id})">$</button>`:''}
               ${(dias<=0||st==='quitado')&&st!=='concluido'?`<button class="btn-concluir-sm" onclick="openModalConcluir(${ev.id})">✓</button>`:''}
-              <button class="btn-icon btn-whatsapp-ic" onclick="abrirWhatsApp('${ev.telefone}','${ev.cliente}','${dataFmt}')"><i class="fa-brands fa-whatsapp"></i></button>
+              <button class="btn-icon btn-whatsapp-ic" title="Enviar lembrete pelo WhatsApp" onclick="enviarLembreteEvento(${Number(ev.id)})"><i class="fa-brands fa-whatsapp"></i></button>
               <button class="btn-icon btn-edit-ic" onclick="editarEvento(${ev.id})"><i class="fa-solid fa-pen"></i></button>
               <button class="btn-icon btn-delete-ic" onclick="excluirEvento(${ev.id})"><i class="fa-solid fa-trash"></i></button>
             </div>
@@ -2058,7 +2059,30 @@
     function openModalConcluir(id){ const ev=eventos.find(e=>e.id===id); if(!ev) return; document.getElementById('modal-concluir').classList.remove('hidden'); document.getElementById('concluir-id').value=ev.id; document.getElementById('concluir-cliente-nome').innerText=ev.cliente; document.getElementById('concluir-evento-data').innerText=ev.data.split('-').reverse().join('/'); document.getElementById('concluir-fotos-reais').value=ev.fotos||0; document.getElementById('concluir-obs').value=ev.obsConclusao||''; }
     function closeModalConcluir(){ document.getElementById('modal-concluir').classList.add('hidden'); }
     async function finalizarConclusao(e){ e.preventDefault(); const id=+document.getElementById('concluir-id').value; const ev=eventos.find(e=>e.id===id); if(ev){ ev.fotosReais=+document.getElementById('concluir-fotos-reais').value||0; ev.obsConclusao=document.getElementById('concluir-obs').value; ev.status='concluido'; ev.pago=getValorTotal(ev); render(); await sincronizarComNuvem('editar',ev);} closeModalConcluir(); }
-    function abrirWhatsApp(tel,cliente,data){ const n=tel.replace(/\D/g,''); const msg=encodeURIComponent(`Olá ${cliente}! Tudo bem? 😊\nPassando para confirmar os detalhes do seu evento no dia ${data} com a *Entre Clicks*.`); window.open(`https://wa.me/55${n}?text=${msg}`,'_blank'); }
+    function enviarLembreteEvento(id) {
+      const ev = eventos.find(e => Number(e.id) === Number(id));
+      if (!ev) return;
+      const digits = String(ev.telefone || '').replace(/\D/g, '');
+      const telefone = digits.startsWith('55') && digits.length >= 12 ? digits : '55' + digits;
+      if (telefone.length < 12 || telefone.length > 13) {
+        alert('Confira o WhatsApp cadastrado para este cliente antes de enviar o lembrete.');
+        return;
+      }
+      const data = String(ev.data || '').split('-').reverse().join('/');
+      const horario = ev.inicio ? String(ev.inicio).slice(0, 5).replace(':', 'h') : 'horário a confirmar';
+      const local = ev.local || 'local a confirmar';
+      const saldo = getSaldoRestante(ev);
+      const financeiro = saldo > 0.005
+        ? '\n\nAproveitamos também para lembrar que ainda temos um saldo de *' + formatMoney(saldo) + '* referente ao seu evento, com pagamento previsto até um dia antes da realização. 💙'
+        : '';
+      const mensagem = 'Olá, ' + (ev.cliente || 'tudo bem') + '! Tudo bem? 😊💙' +
+        '\n\nPassando para lembrar que está chegando o dia do seu evento! 🎉📸' +
+        '\n\nEstamos confirmando nosso atendimento para o dia *' + data + '*, às *' + horario + '*, no *' + local + '*.' +
+        financeiro +
+        '\n\nSe houver alguma alteração ou informação importante, é só nos avisar!' +
+        '\n\nCom carinho,\n*Equipe EntreClicks* 📸💙';
+      window.open('https://wa.me/' + telefone + '?text=' + encodeURIComponent(mensagem), '_blank', 'noopener,noreferrer');
+    }
     function exportarCSV(){ if(!eventos.length) return alert('Sem dados'); let csv='\uFEFFData;Cliente;Telefone;Local;Inicio;Termino;Valor Pacote;Deslocamento;Valor Pago;Saldo;Fotos;Moldura;Contrato;Adicionais\n'; eventos.forEach(ev=>{ const saldo=getSaldoRestante(ev); let adds=[]; if(ev.adicionais){ if(ev.adicionais.ima?.ativo)adds.push('Ima'); if(ev.adicionais.livro?.ativo)adds.push('Livro'); if(ev.adicionais.hora?.ativo)adds.push('Hora Extra'); if(ev.adicionais.outro?.ativo)adds.push(ev.adicionais.outro.desc||'Outro'); } csv+=`${ev.data};${ev.cliente};${ev.telefone};${ev.local};${ev.inicio};${ev.termino};${ev.valor};${ev.deslocamento};${ev.pago};${saldo};${ev.status==='concluido'?ev.fotosReais:ev.fotos};${ev.moldura};${ev.contrato};"${adds.join(', ')}"\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`entre_clicks_${new Date().getFullYear()}.csv`; a.click(); }
 
     // boot
