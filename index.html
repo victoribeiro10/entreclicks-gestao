@@ -1468,14 +1468,14 @@
       return pacote === 'memorias' ? 'Memórias' : pacote === 'momentos' ? 'Momentos' : pacote === 'eternize' ? 'Eternize' : '';
     }
     function getStatusMimo(ev, esperado) {
-      if (ev.mimoStatus) return ev.mimoStatus;
+      if (ev.mimoStatus) return ev.mimoStatus === 'selecao_completa' ? 'impressao_pendente' : ev.mimoStatus;
       const qtd = Number(ev.mimoQtdRecebida) || 0;
       if (!qtd) return 'aguardando_escolha';
       if (esperado && qtd < esperado) return 'escolha_parcial';
-      return 'selecao_completa';
+      return 'impressao_pendente';
     }
     function labelStatusMimo(status) {
-      return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',selecao_completa:'Seleção completa',impressao_pendente:'Impressão pendente',entregue:'Entregue'})[status] || 'Aguardando escolha';
+      return ({aguardando_escolha:'Aguardando escolha',escolha_parcial:'Escolha parcial',impressao_pendente:'Impressão pendente',aguardando_entrega:'Aguardando entrega',entregue:'Entregue'})[status] || 'Aguardando escolha';
     }
     let mimoAbaAtual = 'andamento';
     function switchMimoTab(aba) {
@@ -1490,7 +1490,7 @@
       const pacote = getNomePacoteMimo(ev);
       const direito = esperado === 38 ? '37 fotos + 1 especial (38 no total)' : esperado ? esperado + ' fotos' : 'Contrato não vinculado / pacote não identificado';
       const tr = document.createElement('tr');
-      const statusOptions = ['aguardando_escolha','escolha_parcial','selecao_completa','impressao_pendente','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
+      const statusOptions = ['aguardando_escolha','escolha_parcial','impressao_pendente','aguardando_entrega','entregue'].map(st => '<option value="' + st + '"' + (status === st ? ' selected' : '') + '>' + labelStatusMimo(st) + '</option>').join('');
       tr.innerHTML =
         '<td><div class="cliente-nome">' + (ev.cliente || 'Sem nome') + '</div><div class="evento-horario">' + dataFmt + ' · ' + (ev.local || '') + '</div></td>' +
         '<td><strong>' + (pacote || 'Não identificado') + '</strong><div class="evento-horario">' + direito + '</div>' +
