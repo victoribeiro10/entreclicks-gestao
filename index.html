@@ -2080,7 +2080,7 @@
         '\n\nEstamos confirmando nosso atendimento para o dia *' + data + '*, às *' + horario + '*, no *' + local + '*.' +
         financeiro +
         '\n\nSe houver alguma alteração ou informação importante, é só nos avisar!' +
-        '\n\nCom carinho,\n*Equipe EntreClicks*';
+        '\n\nCom carinho,\n*Equipe EntreClicks*' +\n        '\n\n_Esta é uma mensagem automática._';
       window.open('https://wa.me/' + telefone + '?text=' + encodeURIComponent(mensagem), '_blank', 'noopener,noreferrer');
     }
     function exportarCSV(){ if(!eventos.length) return alert('Sem dados'); let csv='\uFEFFData;Cliente;Telefone;Local;Inicio;Termino;Valor Pacote;Deslocamento;Valor Pago;Saldo;Fotos;Moldura;Contrato;Adicionais\n'; eventos.forEach(ev=>{ const saldo=getSaldoRestante(ev); let adds=[]; if(ev.adicionais){ if(ev.adicionais.ima?.ativo)adds.push('Ima'); if(ev.adicionais.livro?.ativo)adds.push('Livro'); if(ev.adicionais.hora?.ativo)adds.push('Hora Extra'); if(ev.adicionais.outro?.ativo)adds.push(ev.adicionais.outro.desc||'Outro'); } csv+=`${ev.data};${ev.cliente};${ev.telefone};${ev.local};${ev.inicio};${ev.termino};${ev.valor};${ev.deslocamento};${ev.pago};${saldo};${ev.status==='concluido'?ev.fotosReais:ev.fotos};${ev.moldura};${ev.contrato};"${adds.join(', ')}"\n`; }); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`entre_clicks_${new Date().getFullYear()}.csv`; a.click(); }
